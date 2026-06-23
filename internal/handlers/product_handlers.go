@@ -9,6 +9,33 @@ import (
 )
 
 // @Tags Товары
+// @Summary Получить все категории
+// @Description Возвращает id и имена категорий
+// @ID get_categories
+// @Accept json
+// @Produce json
+// @Success 200 {object} dto.Category
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /categories [get]
+func GetCategories(c *gin.Context) {
+
+	err, count, cats := repository.GetCategories(c)
+	if err != nil && err != sql.ErrNoRows {
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	} else if count == 0 {
+		service.ErrorResponse(c, 404, "Ни одной категории не найдено")
+		return
+	}
+
+	res := service.ConvertCategories(cats)
+
+	c.JSON(200, res)
+}
+
+// @Tags Товары
 // @Summary Получить все товары определённой категории
 // @ID get_products
 // @Accept json

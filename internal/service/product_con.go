@@ -5,6 +5,24 @@ import (
 	"deller/internal/schema"
 )
 
+func ConvertCategories(p []schema.Categories) dto.CategoriesResponse {
+	var cate []dto.Category
+	var total int
+	for _, e := range p {
+		gories := dto.Category{
+			Id:              e.Id,
+			Name:            e.Name,
+			TotalInCategory: e.ProductsCount,
+		}
+		cate = append(cate, gories)
+		total++
+	}
+	return dto.CategoriesResponse{
+		Categories: cate,
+		Total:      total,
+	}
+}
+
 func ConvertProducts(p []schema.Products) dto.ProductsResponse {
 	var prod []dto.Product
 	var total int

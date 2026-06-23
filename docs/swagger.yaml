@@ -1,5 +1,14 @@
 basePath: /
 definitions:
+  dto.Category:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      total_in_category:
+        type: integer
+    type: object
   dto.ErrorMessage:
     properties:
       code:
@@ -109,6 +118,34 @@ info:
   title: Deller-Ev API
   version: "0.1"
 paths:
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает id и имена категорий
+      operationId: get_categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Category'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Получить все категории
+      tags:
+      - Товары
   /products/{id}:
     get:
       consumes:

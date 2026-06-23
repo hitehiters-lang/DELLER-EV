@@ -6,6 +6,12 @@ import (
 	"github.com/google/uuid"
 )
 
+type Category struct {
+	Id              uuid.UUID `json:"id"`
+	Name            string    `json:"name"`
+	TotalInCategory int       `json:"total_in_category"`
+}
+
 type Product struct {
 	Id                uuid.UUID `json:"id"`
 	CategoryId        uuid.UUID `json:"category_id"`
@@ -51,6 +57,11 @@ type Specification struct {
 	Clearance          string    `json:"clearance"`
 	Charging           string    `json:"charging"`
 	MoistureProtection string    `json:"moisture_protection"`
+}
+
+type CategoriesResponse struct {
+	Categories []Category `json:"categories"`
+	Total      int        `json:"total"`
 }
 
 type ProductsResponse struct {

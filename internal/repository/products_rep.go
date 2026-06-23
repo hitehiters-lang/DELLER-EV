@@ -10,6 +10,20 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 )
 
+func GetCategories(c *gin.Context) (error, int, []schema.Categories) {
+	var categories []schema.Categories
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	count, err := db.NewSelect().Model(&categories).
+		ColumnExpr("categories.*").
+		ColumnExpr("COUNT(p.id) AS products_count").
+		Join("LEFT JOIN products AS p ON p.category_id = categories.id").
+		Group("categories.id").
+		ScanAndCount(ctx)
+	return err, count, categories
+}
+
 func SelectProductsByCategory(c *gin.Context, cat_id string) (error, int, []schema.Products) {
 	var products []schema.Products
 	ctx := c.Request.Context()

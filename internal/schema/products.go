@@ -6,6 +6,14 @@ import (
 	"github.com/google/uuid"
 )
 
+type Categories struct {
+	Id        uuid.UUID `bun:"id"`
+	Name      string    `bun:"name"`
+	ImagePath string    `bun:"image_path"`
+
+	ProductsCount int `bun:",scanonly"`
+}
+
 type Products struct {
 	Id          uuid.UUID `bun:"id,pk,autoincrement"`
 	CategoryId  uuid.UUID `bun:"category_id"`

@@ -32,6 +32,7 @@ func main() {
 
 	api := r.Group("/api/v1")
 	{
+		api.GET("/categories", handlers.GetCategories)
 		api.GET("/products/list", handlers.GetProducts)
 		api.GET("/products/:id", handlers.GetProductByID)
 		api.GET("/products/:id/tag", handlers.GetProductsByTag)
