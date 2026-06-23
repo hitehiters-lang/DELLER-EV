@@ -5,7 +5,7 @@ import (
 	"deller/internal/schema"
 )
 
-func ConvertProducts(p []schema.Products) dto.ProductResponse {
+func ConvertProducts(p []schema.Products) dto.ProductsResponse {
 	var prod []dto.Product
 	var total int
 	for _, e := range p {
@@ -13,7 +13,7 @@ func ConvertProducts(p []schema.Products) dto.ProductResponse {
 		uct := dto.Product{
 			Id:                e.Id,
 			CategoryId:        e.CategoryId,
-			Stack:             e.Stack,
+			Spec:              e.Spec,
 			Name:              e.Name,
 			Short:             e.Short,
 			Price:             e.Price,
@@ -23,33 +23,50 @@ func ConvertProducts(p []schema.Products) dto.ProductResponse {
 		prod = append(prod, uct)
 		total++
 	}
-	return dto.ProductResponse{
+	return dto.ProductsResponse{
 		Products: prod,
 		Total:    total,
 	}
 }
 
-/*
-func ConvertProductMore(p []schema.Products) dto.ProductResponse {
-	var prod []dto.Product
-	for _, e := range p {
-		pwd := e.Price - (e.Price * (e.Discount / 100))
-		uct := dto.Product{
-			Id:                e.Id,
-			CategoryId:        e.CategoryId,
-			Stack:             e.Stack,
-			Name:              e.Name,
-			Short:             e.Short,
-			Description:       e.Description,
-			Price:             e.Price,
-			Discount:          e.Discount,
-			Tags:              e.Tags,
-			CreatedAt:         e.CreatedAt,
-			UpdatedAt:         e.UpdatedAt,
-			DeletedAt:         e.DeletedAt,
-			PriceWithDiscount: pwd,
+func ConvertProductDetail(p schema.Products) dto.ProductDetail {
+	pwd := p.Price - (p.Price * (p.Discount / 100))
+	var spec dto.Specification
+	if p.Specification != nil {
+		spec = dto.Specification{
+			Id:                 p.Specification.Id,
+			Gear:               p.Specification.Gear,
+			PowerRatedMax:      p.Specification.PowerRatedMax,
+			TorqueMoment:       p.Specification.TorqueMoment,
+			MaxSpeed:           p.Specification.MaxSpeed,
+			Battery:            p.Specification.Battery,
+			PowerReserve:       p.Specification.PowerReserve,
+			Weight:             p.Specification.Weight,
+			LoadCap:            p.Specification.LoadCap,
+			DimensionsLWH:      p.Specification.DimensionsLWH,
+			SeatHeight:         p.Specification.SeatHeight,
+			Tires:              p.Specification.Tires,
+			Break:              p.Specification.Break,
+			Clearance:          p.Specification.Clearance,
+			Charging:           p.Specification.Charging,
+			MoistureProtection: p.Specification.MoistureProtection,
 		}
-		prod = append(prod, uct)
 	}
-
-}*/
+	product := dto.ProductDetail{
+		Id:                p.Id,
+		CategoryId:        p.CategoryId,
+		Spec:              p.Spec,
+		Name:              p.Name,
+		Short:             p.Short,
+		Description:       p.Description,
+		Price:             p.Price,
+		Discount:          p.Discount,
+		Tags:              p.Tags,
+		CreatedAt:         p.CreatedAt,
+		UpdatedAt:         p.UpdatedAt,
+		DeletedAt:         p.DeletedAt,
+		PriceWithDiscount: pwd,
+		Specification:     spec,
+	}
+	return product
+}

@@ -42,7 +42,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProductResponse"
+                            "$ref": "#/definitions/dto.ProductsResponse"
                         }
                     },
                     "400": {
@@ -53,6 +53,64 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "description": "Возвращает подробное описание товара и его характеристики (если есть)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Товары"
+                ],
+                "summary": "Получить товар по id",
+                "operationId": "get_product_by_id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "uuid товара",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProductDetail"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorMessage"
                         }
@@ -97,12 +155,62 @@ const docTemplate = `{
                 "short": {
                     "type": "string"
                 },
-                "stack": {
+                "spec": {
                     "type": "string"
                 }
             }
         },
-        "dto.ProductResponse": {
+        "dto.ProductDetail": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "discount": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "price_with_discount": {
+                    "type": "integer"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "spec": {
+                    "type": "string"
+                },
+                "specification": {
+                    "$ref": "#/definitions/dto.Specification"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ProductsResponse": {
             "type": "object",
             "properties": {
                 "products": {
@@ -113,6 +221,59 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.Specification": {
+            "type": "object",
+            "properties": {
+                "battery": {
+                    "type": "string"
+                },
+                "break": {
+                    "type": "string"
+                },
+                "charging": {
+                    "type": "string"
+                },
+                "clearance": {
+                    "type": "string"
+                },
+                "dimensions_l_w_h": {
+                    "type": "string"
+                },
+                "gear": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "load_cap": {
+                    "type": "string"
+                },
+                "max_speed": {
+                    "type": "string"
+                },
+                "moisture_protection": {
+                    "type": "string"
+                },
+                "power_rated_max": {
+                    "type": "string"
+                },
+                "power_reserve": {
+                    "type": "string"
+                },
+                "seat_height": {
+                    "type": "string"
+                },
+                "tires": {
+                    "type": "string"
+                },
+                "torque_moment": {
+                    "type": "string"
+                },
+                "weight": {
+                    "type": "string"
                 }
             }
         }

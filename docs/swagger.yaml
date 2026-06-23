@@ -23,10 +23,43 @@ definitions:
         type: integer
       short:
         type: string
-      stack:
+      spec:
         type: string
     type: object
-  dto.ProductResponse:
+  dto.ProductDetail:
+    properties:
+      category_id:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      discount:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      price_with_discount:
+        type: integer
+      short:
+        type: string
+      spec:
+        type: string
+      specification:
+        $ref: '#/definitions/dto.Specification'
+      tags:
+        items:
+          type: string
+        type: array
+      updated_at:
+        type: string
+    type: object
+  dto.ProductsResponse:
     properties:
       products:
         items:
@@ -35,12 +68,83 @@ definitions:
       total:
         type: integer
     type: object
+  dto.Specification:
+    properties:
+      battery:
+        type: string
+      break:
+        type: string
+      charging:
+        type: string
+      clearance:
+        type: string
+      dimensions_l_w_h:
+        type: string
+      gear:
+        type: string
+      id:
+        type: string
+      load_cap:
+        type: string
+      max_speed:
+        type: string
+      moisture_protection:
+        type: string
+      power_rated_max:
+        type: string
+      power_reserve:
+        type: string
+      seat_height:
+        type: string
+      tires:
+        type: string
+      torque_moment:
+        type: string
+      weight:
+        type: string
+    type: object
 info:
   contact: {}
   description: Документация к API.
   title: Deller-Ev API
   version: "0.1"
 paths:
+  /products/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает подробное описание товара и его характеристики (если
+        есть)
+      operationId: get_product_by_id
+      parameters:
+      - description: uuid товара
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProductDetail'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Получить товар по id
+      tags:
+      - Товары
   /products/list:
     get:
       consumes:
@@ -59,13 +163,17 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProductResponse'
+            $ref: '#/definitions/dto.ProductsResponse'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/dto.ErrorMessage'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorMessage'
       summary: Получить все товары определённой категории

@@ -7,9 +7,9 @@ import (
 )
 
 type Products struct {
-	Id          uuid.UUID `bun:"id"`
+	Id          uuid.UUID `bun:"id,pk,autoincrement"`
 	CategoryId  uuid.UUID `bun:"category_id"`
-	Stack       uuid.UUID `bun:"stack"`
+	Spec        uuid.UUID `bun:"spec"`
 	Name        string    `bun:"name"`
 	Short       string    `bun:"short"`
 	Description string    `bun:"description"`
@@ -19,4 +19,6 @@ type Products struct {
 	CreatedAt   time.Time `bun:"created_at"`
 	UpdatedAt   time.Time `bun:"updated_at"`
 	DeletedAt   time.Time `bun:"deleted_at"`
+
+	Specification *MotoSpecifications `bun:"rel:belongs-to,join:spec=id"`
 }

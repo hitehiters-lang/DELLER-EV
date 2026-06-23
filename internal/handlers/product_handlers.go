@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"deller/internal/repository"
 	"deller/internal/service"
 
@@ -13,16 +14,21 @@ import (
 // @Accept json
 // @Produce json
 // @Param category query string true "uuid категории" format(uuid)
-// @Success 200 {object} dto.ProductResponse
+// @Success 200 {object} dto.ProductsResponse
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
 // @Router /products/list [get]
 func GetProducts(c *gin.Context) {
 
 	category_str := c.Query("category")
+	if category_str == "" {
+		service.ErrorResponse(c, 400, "Катория не указана")
+		return
+	}
 
 	err, count, sch := repository.SelectProductsByCategory(c, category_str)
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
 		return
 	} else if count == 0 {
@@ -31,6 +37,40 @@ func GetProducts(c *gin.Context) {
 	}
 
 	res := service.ConvertProducts(sch)
+
+	c.JSON(200, res)
+}
+
+// @Tags Товары
+// @Summary Получить товар по id
+// @Description Возвращает подробное описание товара и его характеристики (если есть)
+// @ID get_product_by_id
+// @Accept json
+// @Produce json
+// @Param id path string true "uuid товара" format(uuid)
+// @Success 200 {object} dto.ProductDetail
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /products/{id} [get]
+func GetProductByID(c *gin.Context) {
+
+	prod_uuid := c.Param("id")
+	if prod_uuid == "" {
+		service.ErrorResponse(c, 400, "Товар не указан")
+		return
+	}
+
+	err, count, prod := repository.GetProductDetail(c, prod_uuid)
+	if err != nil && err != sql.ErrNoRows {
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	} else if count == 0 {
+		service.ErrorResponse(c, 404, "Ни одного продукта по заданному id не найдено")
+		return
+	}
+
+	res := service.ConvertProductDetail(prod)
 
 	c.JSON(200, res)
 }
