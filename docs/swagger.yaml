@@ -1,0 +1,80 @@
+basePath: /
+definitions:
+  dto.ErrorMessage:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  dto.Product:
+    properties:
+      category_id:
+        type: string
+      discount:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      price_with_discount:
+        type: integer
+      short:
+        type: string
+      stack:
+        type: string
+    type: object
+  dto.ProductResponse:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/dto.Product'
+        type: array
+      total:
+        type: integer
+    type: object
+info:
+  contact: {}
+  description: Документация к API.
+  title: Deller-Ev API
+  version: "0.1"
+paths:
+  /products/list:
+    get:
+      consumes:
+      - application/json
+      operationId: get_products
+      parameters:
+      - description: uuid категории
+        format: uuid
+        in: query
+        name: category
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProductResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Получить все товары определённой категории
+      tags:
+      - Товары
+securityDefinitions:
+  BearerAuth:
+    description: Введите JWT токен
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
