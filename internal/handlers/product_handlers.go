@@ -74,3 +74,37 @@ func GetProductByID(c *gin.Context) {
 
 	c.JSON(200, res)
 }
+
+// @Tags Товары
+// @Summary Получить похожие товары по тегу
+// @Description Возвращает товары которые с таким же тегом, как и у входящего товара. Если таких нет, или их не 4 - добивает рандомными до 4ёх.
+// @ID get_products_by_tag
+// @Accept json
+// @Produce json
+// @Param id path string true "uuid товара" format(uuid)
+// @Success 200 {object} dto.ProductsResponse
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /products/{id}/tag [get]
+func GetProductsByTag(c *gin.Context) {
+
+	prod_uuid := c.Param("id")
+	if prod_uuid == "" {
+		service.ErrorResponse(c, 400, "Товар не указан")
+		return
+	}
+
+	err, count, related := repository.GetProductsByTag(c, prod_uuid)
+	if err != nil && err != sql.ErrNoRows {
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	} else if count == 0 {
+		service.ErrorResponse(c, 404, "Ни одного продукта по заданному id не найдено")
+		return
+	}
+
+	res := service.ConvertProducts(related)
+
+	c.JSON(200, res)
+}
