@@ -47,6 +47,9 @@ func main() {
 		auth.Use(pkgauth.JWTAuthMiddleware())
 		{
 			auth.GET("/auth/me", handlers.Me)
+
+			auth.POST("/admin/categories", handlers.AddCategory)
+			auth.POST("/admin/images", handlers.AddPicture)
 		}
 	}
 

@@ -1,5 +1,14 @@
 basePath: /
 definitions:
+  dto.AddCategoryBody:
+    properties:
+      id:
+        type: string
+      image_name:
+        type: string
+      name:
+        type: string
+    type: object
   dto.CategoriesResponse:
     properties:
       categories:
@@ -12,6 +21,8 @@ definitions:
   dto.Category:
     properties:
       id:
+        type: string
+      image_path:
         type: string
       name:
         type: string
@@ -152,6 +163,15 @@ definitions:
       weight:
         type: string
     type: object
+  dto.UploadMessage:
+    properties:
+      code:
+        type: integer
+      link:
+        type: string
+      message:
+        type: string
+    type: object
   dto.User:
     properties:
       created_at:
@@ -171,6 +191,88 @@ info:
   title: Deller-Ev API
   version: "0.2"
 paths:
+  /admin/categories:
+    post:
+      consumes:
+      - application/json
+      operationId: add_category
+      parameters:
+      - description: Данные категории
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddCategoryBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.Category'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Создать новую категорию
+      tags:
+      - Админ
+  /admin/images:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Сохраняет картинку в статику. Должно использоваться совместно с
+        другими ручками, например добавления товара или категории.
+      operationId: add_picture
+      parameters:
+      - description: PNG изображение
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Имя изображения
+        in: formData
+        name: image_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.UploadMessage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Сохранить картинку
+      tags:
+      - Админ
   /auth/login:
     post:
       consumes:

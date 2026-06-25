@@ -13,6 +13,7 @@ func ConvertCategories(p []schema.Categories) dto.CategoriesResponse {
 		gories := dto.Category{
 			Id:              e.Id,
 			Name:            e.Name,
+			ImagePath:       e.ImagePath,
 			TotalInCategory: e.ProductsCount,
 		}
 		cate = append(cate, gories)
@@ -22,6 +23,16 @@ func ConvertCategories(p []schema.Categories) dto.CategoriesResponse {
 		Categories: cate,
 		Total:      total,
 	}
+}
+
+func ConvertCategory(p schema.Categories) dto.Category {
+	cat := dto.Category{
+		Id:              p.Id,
+		Name:            p.Name,
+		ImagePath:       p.ImagePath,
+		TotalInCategory: 0,
+	}
+	return cat
 }
 
 func ConvertProducts(p []schema.Products) dto.ProductsResponse {

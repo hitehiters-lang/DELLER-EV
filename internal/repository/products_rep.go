@@ -2,6 +2,7 @@ package repository
 
 import (
 	"deller/internal/database"
+	"deller/internal/dto"
 	"deller/internal/schema"
 
 	"github.com/gin-gonic/gin"
@@ -100,4 +101,26 @@ func GetMainPicture(c *gin.Context, prod_id string) schema.ProductImages {
 	db := database.GetDatabase()
 	db.NewSelect().Model(&pictures).Where("product_id = ? AND is_main = true", prod_id).Scan(ctx)
 	return pictures
+}
+
+func CheckCategory(c *gin.Context, cat_id string) error {
+	var categories schema.Categories
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	err := db.NewSelect().Model(&categories).Where("id = ?", cat_id).Scan(ctx)
+	return err
+}
+
+func AddCategory(c *gin.Context, body dto.AddCategoryBody) (schema.Categories, error) {
+	new_category := schema.Categories{
+		Id:        body.Id,
+		Name:      body.Name,
+		ImagePath: "/images/" + body.ImageName + ".png",
+	}
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	err := db.NewInsert().Model(&new_category).Returning("*").Scan(ctx)
+	return new_category, err
 }
