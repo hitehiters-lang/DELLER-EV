@@ -1,5 +1,14 @@
 basePath: /
 definitions:
+  dto.CategoriesResponse:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/dto.Category'
+        type: array
+      total:
+        type: integer
+    type: object
   dto.Category:
     properties:
       id:
@@ -33,7 +42,7 @@ definitions:
       short:
         type: string
       spec:
-        type: string
+        type: integer
     type: object
   dto.ProductDetail:
     properties:
@@ -49,6 +58,10 @@ definitions:
         type: integer
       id:
         type: string
+      images:
+        items:
+          $ref: '#/definitions/dto.ProductImage'
+        type: array
       name:
         type: string
       price:
@@ -58,7 +71,7 @@ definitions:
       short:
         type: string
       spec:
-        type: string
+        type: integer
       specification:
         $ref: '#/definitions/dto.Specification'
       tags:
@@ -66,6 +79,17 @@ definitions:
           type: string
         type: array
       updated_at:
+        type: string
+    type: object
+  dto.ProductImage:
+    properties:
+      id:
+        type: string
+      image_path:
+        type: string
+      is_main:
+        type: boolean
+      product_id:
         type: string
     type: object
   dto.ProductsResponse:
@@ -130,7 +154,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.Category'
+            $ref: '#/definitions/dto.CategoriesResponse'
         "400":
           description: Bad Request
           schema:
@@ -146,6 +170,39 @@ paths:
       summary: Получить все категории
       tags:
       - Товары
+  /categories/{id}:
+    get:
+      consumes:
+      - application/json
+      operationId: get_products
+      parameters:
+      - description: id категории
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProductsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Получить все товары определённой категории
+      tags:
+      - Товары
   /products/{id}:
     get:
       consumes:
@@ -154,8 +211,7 @@ paths:
         есть)
       operationId: get_product_by_id
       parameters:
-      - description: uuid товара
-        format: uuid
+      - description: id товара
         in: path
         name: id
         required: true
@@ -182,7 +238,7 @@ paths:
       summary: Получить товар по id
       tags:
       - Товары
-  /products/{id}/tag:
+  /products/{id}/relative:
     get:
       consumes:
       - application/json
@@ -190,8 +246,7 @@ paths:
         Если таких нет, или их не 4 - добивает рандомными до 4ёх.
       operationId: get_products_by_tag
       parameters:
-      - description: uuid товара
-        format: uuid
+      - description: id товара
         in: path
         name: id
         required: true
@@ -216,40 +271,6 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorMessage'
       summary: Получить похожие товары по тегу
-      tags:
-      - Товары
-  /products/list:
-    get:
-      consumes:
-      - application/json
-      operationId: get_products
-      parameters:
-      - description: uuid категории
-        format: uuid
-        in: query
-        name: category
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.ProductsResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dto.ErrorMessage'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/dto.ErrorMessage'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dto.ErrorMessage'
-      summary: Получить все товары определённой категории
       tags:
       - Товары
 securityDefinitions:

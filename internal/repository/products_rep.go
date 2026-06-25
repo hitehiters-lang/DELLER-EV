@@ -5,7 +5,6 @@ import (
 	"deller/internal/schema"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 )
@@ -33,34 +32,34 @@ func SelectProductsByCategory(c *gin.Context, cat_id string) (error, int, []sche
 	return err, count, products
 }
 
-func GetProductDetail(c *gin.Context, prod_uuid string) (error, int, schema.Products) {
+func GetProductDetail(c *gin.Context, prod_id string) (error, int, schema.Products) {
 	var product schema.Products
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
-	count, err := db.NewSelect().Model(&product).Relation("Specification").Where("products.id = ?", prod_uuid).ScanAndCount(ctx)
+	count, err := db.NewSelect().Model(&product).Relation("Specification").Where("products.id = ?", prod_id).ScanAndCount(ctx)
 	return err, count, product
 }
 
-func GetProductsByTag(c *gin.Context, prod_uuid string) (error, int, []schema.Products) {
+func GetProductsByTag(c *gin.Context, prod_id string) (error, int, []schema.Products) {
 	var product schema.Products
 	var related_products []schema.Products
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
-	count, err := db.NewSelect().Model(&product).Where("products.id = ?", prod_uuid).ScanAndCount(ctx)
+	count, err := db.NewSelect().Model(&product).Where("products.id = ?", prod_id).ScanAndCount(ctx)
 	if err != nil || count == 0 {
 		return err, count, related_products
 	}
 
 	tags := product.Tags
 	count, err = db.NewSelect().Model(&related_products).Where("products.tags && ?", pgdialect.Array(tags)).
-		OrderExpr("RANDOM()").Limit(4).Where("products.id != ?", prod_uuid).ScanAndCount(ctx)
+		OrderExpr("RANDOM()").Limit(4).Where("products.id != ?", prod_id).ScanAndCount(ctx)
 	if count < 4 {
 		var added_products []schema.Products
 		needed := 4 - count
 
-		excludedIDs := []uuid.UUID{uuid.MustParse(prod_uuid)}
+		excludedIDs := []string{prod_id}
 		for _, p := range related_products {
 			excludedIDs = append(excludedIDs, p.Id)
 		}
@@ -79,4 +78,22 @@ func GetProductsByTag(c *gin.Context, prod_uuid string) (error, int, []schema.Pr
 		count = len(related_products)
 	}
 	return err, count, related_products
+}
+
+func GetProductPictures(c *gin.Context, prod_id string) (error, int, []schema.ProductImages) {
+	var pictures []schema.ProductImages
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	count, err := db.NewSelect().Model(&pictures).Where("product_id = ?", prod_id).ScanAndCount(ctx)
+	return err, count, pictures
+}
+
+func GetMainPicture(c *gin.Context, prod_id string) (error, int, []schema.ProductImages) {
+	var pictures []schema.ProductImages
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	count, err := db.NewSelect().Model(&pictures).Where("product_id = ? AND is_main = true", prod_id).ScanAndCount(ctx)
+	return err, count, pictures
 }

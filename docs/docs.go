@@ -33,7 +33,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.Category"
+                            "$ref": "#/definitions/dto.CategoriesResponse"
                         }
                     },
                     "400": {
@@ -57,7 +57,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/products/list": {
+        "/categories/{id}": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -73,10 +73,9 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "uuid",
-                        "description": "uuid категории",
-                        "name": "category",
-                        "in": "query",
+                        "description": "id категории",
+                        "name": "id",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -125,8 +124,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "uuid",
-                        "description": "uuid товара",
+                        "description": "id товара",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -160,7 +158,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/products/{id}/tag": {
+        "/products/{id}/relative": {
             "get": {
                 "description": "Возвращает товары которые с таким же тегом, как и у входящего товара. Если таких нет, или их не 4 - добивает рандомными до 4ёх.",
                 "consumes": [
@@ -177,8 +175,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "uuid",
-                        "description": "uuid товара",
+                        "description": "id товара",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -214,6 +211,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.CategoriesResponse": {
+            "type": "object",
+            "properties": {
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.Category"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.Category": {
             "type": "object",
             "properties": {
@@ -264,7 +275,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "spec": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         },
@@ -289,6 +300,12 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ProductImage"
+                    }
+                },
                 "name": {
                     "type": "string"
                 },
@@ -302,7 +319,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "spec": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "specification": {
                     "$ref": "#/definitions/dto.Specification"
@@ -314,6 +331,23 @@ const docTemplate = `{
                     }
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ProductImage": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "image_path": {
+                    "type": "string"
+                },
+                "is_main": {
+                    "type": "boolean"
+                },
+                "product_id": {
                     "type": "string"
                 }
             }

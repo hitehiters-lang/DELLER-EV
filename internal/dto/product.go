@@ -7,37 +7,38 @@ import (
 )
 
 type Category struct {
-	Id              uuid.UUID `json:"id"`
-	Name            string    `json:"name"`
-	TotalInCategory int       `json:"total_in_category"`
+	Id              string `json:"id"`
+	Name            string `json:"name"`
+	TotalInCategory int    `json:"total_in_category"`
 }
 
 type Product struct {
-	Id                uuid.UUID `json:"id"`
-	CategoryId        uuid.UUID `json:"category_id"`
-	Spec              uuid.UUID `json:"spec"`
-	Name              string    `json:"name"`
-	Short             string    `json:"short"`
-	Price             int       `json:"price"`
-	Discount          int       `json:"discount"`
-	PriceWithDiscount int       `json:"price_with_discount"`
+	Id                string `json:"id"`
+	CategoryId        string `json:"category_id"`
+	Spec              int    `json:"spec"`
+	Name              string `json:"name"`
+	Short             string `json:"short"`
+	Price             int    `json:"price"`
+	Discount          int    `json:"discount"`
+	PriceWithDiscount int    `json:"price_with_discount"`
 }
 
 type ProductDetail struct {
-	Id                uuid.UUID     `json:"id"`
-	CategoryId        uuid.UUID     `json:"category_id"`
-	Spec              uuid.UUID     `json:"spec"`
-	Name              string        `json:"name"`
-	Short             string        `json:"short"`
-	Description       string        `json:"description"`
-	Price             int           `json:"price"`
-	Discount          int           `json:"discount"`
-	Tags              []string      `json:"tags"`
-	CreatedAt         time.Time     `json:"created_at"`
-	UpdatedAt         time.Time     `json:"updated_at"`
-	DeletedAt         time.Time     `json:"deleted_at"`
-	PriceWithDiscount int           `json:"price_with_discount"`
-	Specification     Specification `json:"specification"`
+	Id                string         `json:"id"`
+	CategoryId        string         `json:"category_id"`
+	Spec              int            `json:"spec"`
+	Name              string         `json:"name"`
+	Short             string         `json:"short"`
+	Description       string         `json:"description"`
+	Price             int            `json:"price"`
+	Discount          int            `json:"discount"`
+	Tags              []string       `json:"tags"`
+	CreatedAt         time.Time      `json:"created_at"`
+	UpdatedAt         time.Time      `json:"updated_at"`
+	DeletedAt         time.Time      `json:"deleted_at"`
+	PriceWithDiscount int            `json:"price_with_discount"`
+	Specification     Specification  `json:"specification"`
+	Images            []ProductImage `json:"images"`
 }
 
 type Specification struct {
@@ -67,4 +68,11 @@ type CategoriesResponse struct {
 type ProductsResponse struct {
 	Products []Product `json:"products"`
 	Total    int       `json:"total"`
+}
+
+type ProductImage struct {
+	Id        uuid.UUID `json:"id"`
+	ProductId string    `json:"product_id"`
+	IsMain    bool      `json:"is_main"`
+	ImagePath string    `json:"image_path"`
 }

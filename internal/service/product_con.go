@@ -3,6 +3,7 @@ package service
 import (
 	"deller/internal/dto"
 	"deller/internal/schema"
+	"path/filepath"
 )
 
 func ConvertCategories(p []schema.Categories) dto.CategoriesResponse {
@@ -47,7 +48,7 @@ func ConvertProducts(p []schema.Products) dto.ProductsResponse {
 	}
 }
 
-func ConvertProductDetail(p schema.Products) dto.ProductDetail {
+func ConvertProductDetail(p schema.Products, v []dto.ProductImage) dto.ProductDetail {
 	pwd := p.Price - (p.Price * (p.Discount / 100))
 	var spec dto.Specification
 	if p.Specification != nil {
@@ -85,6 +86,43 @@ func ConvertProductDetail(p schema.Products) dto.ProductDetail {
 		DeletedAt:         p.DeletedAt,
 		PriceWithDiscount: pwd,
 		Specification:     spec,
+		Images:            v,
 	}
 	return product
+}
+
+func GetImages(i []schema.ProductImages) []dto.ProductImage {
+	var res []dto.ProductImage
+
+	for _, e := range i {
+		file_name := filepath.Base(e.ImagePath)
+		url_path := "/api/v1/images/" + file_name
+
+		var img dto.ProductImage
+		img = dto.ProductImage{
+			Id:        e.Id,
+			ProductId: e.ProductId,
+			IsMain:    e.IsMain,
+			ImagePath: url_path,
+		}
+		res = append(res, img)
+	}
+
+	return res
+}
+
+func GetMainImage(i schema.ProductImages) dto.ProductImage {
+
+	file_name := filepath.Base(i.ImagePath)
+	url_path := "/api/v1/images/" + file_name
+
+	var img dto.ProductImage
+	img = dto.ProductImage{
+		Id:        i.Id,
+		ProductId: i.ProductId,
+		IsMain:    i.IsMain,
+		ImagePath: url_path,
+	}
+
+	return img
 }

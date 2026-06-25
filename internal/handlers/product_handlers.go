@@ -14,7 +14,7 @@ import (
 // @ID get_categories
 // @Accept json
 // @Produce json
-// @Success 200 {object} dto.Category
+// @Success 200 {object} dto.CategoriesResponse
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 404 {object} dto.ErrorMessage
 // @Failure 500 {object} dto.ErrorMessage
@@ -40,21 +40,21 @@ func GetCategories(c *gin.Context) {
 // @ID get_products
 // @Accept json
 // @Produce json
-// @Param category query string true "uuid категории" format(uuid)
+// @Param id path string true "id категории"
 // @Success 200 {object} dto.ProductsResponse
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 404 {object} dto.ErrorMessage
 // @Failure 500 {object} dto.ErrorMessage
-// @Router /products/list [get]
+// @Router /categories/{id} [get]
 func GetProducts(c *gin.Context) {
 
-	category_str := c.Query("category")
-	if category_str == "" {
-		service.ErrorResponse(c, 400, "Катория не указана")
+	category := c.Param("id")
+	if category == "" {
+		service.ErrorResponse(c, 400, "Категория не указана")
 		return
 	}
 
-	err, count, sch := repository.SelectProductsByCategory(c, category_str)
+	err, count, sch := repository.SelectProductsByCategory(c, category)
 	if err != nil && err != sql.ErrNoRows {
 		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
 		return
@@ -74,7 +74,7 @@ func GetProducts(c *gin.Context) {
 // @ID get_product_by_id
 // @Accept json
 // @Produce json
-// @Param id path string true "uuid товара" format(uuid)
+// @Param id path string true "id товара"
 // @Success 200 {object} dto.ProductDetail
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 404 {object} dto.ErrorMessage
@@ -82,13 +82,13 @@ func GetProducts(c *gin.Context) {
 // @Router /products/{id} [get]
 func GetProductByID(c *gin.Context) {
 
-	prod_uuid := c.Param("id")
-	if prod_uuid == "" {
+	prod_id := c.Param("id")
+	if prod_id == "" {
 		service.ErrorResponse(c, 400, "Товар не указан")
 		return
 	}
 
-	err, count, prod := repository.GetProductDetail(c, prod_uuid)
+	err, count, prod := repository.GetProductDetail(c, prod_id)
 	if err != nil && err != sql.ErrNoRows {
 		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
 		return
@@ -96,8 +96,10 @@ func GetProductByID(c *gin.Context) {
 		service.ErrorResponse(c, 404, "Ни одного продукта по заданному id не найдено")
 		return
 	}
+	err, count, imgs := repository.GetProductPictures(c, prod_id)
 
-	res := service.ConvertProductDetail(prod)
+	img_arr := service.GetImages(imgs)
+	res := service.ConvertProductDetail(prod, img_arr)
 
 	c.JSON(200, res)
 }
@@ -108,21 +110,21 @@ func GetProductByID(c *gin.Context) {
 // @ID get_products_by_tag
 // @Accept json
 // @Produce json
-// @Param id path string true "uuid товара" format(uuid)
+// @Param id path string true "id товара"
 // @Success 200 {object} dto.ProductsResponse
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 404 {object} dto.ErrorMessage
 // @Failure 500 {object} dto.ErrorMessage
-// @Router /products/{id}/tag [get]
+// @Router /products/{id}/relative [get]
 func GetProductsByTag(c *gin.Context) {
 
-	prod_uuid := c.Param("id")
-	if prod_uuid == "" {
+	prod_id := c.Param("id")
+	if prod_id == "" {
 		service.ErrorResponse(c, 400, "Товар не указан")
 		return
 	}
 
-	err, count, related := repository.GetProductsByTag(c, prod_uuid)
+	err, count, related := repository.GetProductsByTag(c, prod_id)
 	if err != nil && err != sql.ErrNoRows {
 		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
 		return

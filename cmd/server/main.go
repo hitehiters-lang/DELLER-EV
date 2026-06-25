@@ -32,10 +32,13 @@ func main() {
 
 	api := r.Group("/api/v1")
 	{
+		api.Static("/images", "./shared")
+
 		api.GET("/categories", handlers.GetCategories)
-		api.GET("/products/list", handlers.GetProducts)
+		api.GET("/categories/:id", handlers.GetProducts)
+
 		api.GET("/products/:id", handlers.GetProductByID)
-		api.GET("/products/:id/tag", handlers.GetProductsByTag)
+		api.GET("/products/:id/relative", handlers.GetProductsByTag)
 	}
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
