@@ -108,3 +108,47 @@ func AddCategory(c *gin.Context) {
 	}
 	service.ErrorResponse(c, 409, "Категория уже существует")
 }
+
+// @Tags Админ
+// @Summary Удалить категорию
+// @ID del_category
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "id категории"
+// @Success 200 {object} dto.Message
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/categories/{id} [delete]
+func DelCategory(c *gin.Context) {
+
+	r, err := pkgauth.GetCurrentRights(c)
+	if r != "a" {
+		service.ErrorResponse(c, 403, "Недостаточно прав")
+		return
+	}
+
+	category := c.Param("id")
+	if category == "" {
+		service.ErrorResponse(c, 400, "Категория не указана")
+		return
+	}
+
+	err = repository.CheckCategory(c, category)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			service.ErrorResponse(c, 404, "Категория не существует")
+			return
+		}
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
+
+	err = repository.DeleteCategory(c, category)
+	c.JSON(200, dto.Message{
+		Code:    200,
+		Message: "Категория " + category + " успешно удалена",
+	})
+}

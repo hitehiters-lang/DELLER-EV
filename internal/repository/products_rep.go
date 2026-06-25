@@ -124,3 +124,12 @@ func AddCategory(c *gin.Context, body dto.AddCategoryBody) (schema.Categories, e
 	err := db.NewInsert().Model(&new_category).Returning("*").Scan(ctx)
 	return new_category, err
 }
+
+func DeleteCategory(c *gin.Context, cat string) error {
+	var del_category schema.Categories
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	_, err := db.NewDelete().Model(&del_category).Where("id = ?", cat).Exec(ctx)
+	return err
+}
