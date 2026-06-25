@@ -26,9 +26,13 @@ func GetCategories(c *gin.Context) (error, int, []schema.Categories) {
 func SelectProductsByCategory(c *gin.Context, cat_id string) (error, int, []schema.Products) {
 	var products []schema.Products
 	ctx := c.Request.Context()
-
 	db := database.GetDatabase()
-	count, err := db.NewSelect().Model(&products).Where("category_id = ?", cat_id).ScanAndCount(ctx)
+
+	count, err := db.NewSelect().
+		Model(&products).
+		Where("category_id = ?", cat_id).
+		Where("deleted_at IS NULL").
+		ScanAndCount(ctx)
 	return err, count, products
 }
 
@@ -80,20 +84,20 @@ func GetProductsByTag(c *gin.Context, prod_id string) (error, int, []schema.Prod
 	return err, count, related_products
 }
 
-func GetProductPictures(c *gin.Context, prod_id string) (error, int, []schema.ProductImages) {
+func GetProductPictures(c *gin.Context, prod_id string) []schema.ProductImages {
 	var pictures []schema.ProductImages
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
-	count, err := db.NewSelect().Model(&pictures).Where("product_id = ?", prod_id).ScanAndCount(ctx)
-	return err, count, pictures
+	db.NewSelect().Model(&pictures).Where("product_id = ?", prod_id).Scan(ctx)
+	return pictures
 }
 
-func GetMainPicture(c *gin.Context, prod_id string) (error, int, []schema.ProductImages) {
-	var pictures []schema.ProductImages
+func GetMainPicture(c *gin.Context, prod_id string) schema.ProductImages {
+	var pictures schema.ProductImages
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
-	count, err := db.NewSelect().Model(&pictures).Where("product_id = ? AND is_main = true", prod_id).ScanAndCount(ctx)
-	return err, count, pictures
+	db.NewSelect().Model(&pictures).Where("product_id = ? AND is_main = true", prod_id).Scan(ctx)
+	return pictures
 }

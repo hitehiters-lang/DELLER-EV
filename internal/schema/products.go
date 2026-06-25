@@ -15,9 +15,9 @@ type Categories struct {
 }
 
 type Products struct {
-	Id          string    `bun:"id,pk,autoincrement"`
+	Id          string    `bun:"id,pk"`
 	CategoryId  string    `bun:"category_id"`
-	Spec        int       `bun:"spec"`
+	Spec        uuid.UUID `bun:"spec"`
 	Name        string    `bun:"name"`
 	Short       string    `bun:"short"`
 	Description string    `bun:"description"`
@@ -27,13 +27,13 @@ type Products struct {
 	CreatedAt   time.Time `bun:"created_at"`
 	UpdatedAt   time.Time `bun:"updated_at"`
 	DeletedAt   time.Time `bun:"deleted_at"`
+	MainImage   string    `bun:"main_image"`
 
 	Specification *MotoSpecifications `bun:"rel:belongs-to,join:spec=id"`
 }
 
 type ProductImages struct {
-	Id        uuid.UUID `bun:"id"`
+	Id        uuid.UUID `bun:"id,pk"`
 	ProductId string    `bun:"product_id"`
-	IsMain    bool      `bun:"is_main"`
 	ImagePath string    `bun:"image_path"`
 }

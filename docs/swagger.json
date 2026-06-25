@@ -255,6 +255,9 @@
                 "id": {
                     "type": "string"
                 },
+                "main_image": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -268,7 +271,7 @@
                     "type": "string"
                 },
                 "spec": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -299,6 +302,9 @@
                         "$ref": "#/definitions/dto.ProductImage"
                     }
                 },
+                "main_image": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -312,7 +318,7 @@
                     "type": "string"
                 },
                 "spec": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "specification": {
                     "$ref": "#/definitions/dto.Specification"

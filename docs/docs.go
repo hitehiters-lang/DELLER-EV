@@ -262,6 +262,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "main_image": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -275,7 +278,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "spec": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -306,6 +309,9 @@ const docTemplate = `{
                         "$ref": "#/definitions/dto.ProductImage"
                     }
                 },
+                "main_image": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -319,7 +325,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "spec": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "specification": {
                     "$ref": "#/definitions/dto.Specification"

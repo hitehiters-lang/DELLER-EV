@@ -33,6 +33,8 @@ definitions:
         type: integer
       id:
         type: string
+      main_image:
+        type: string
       name:
         type: string
       price:
@@ -42,7 +44,7 @@ definitions:
       short:
         type: string
       spec:
-        type: integer
+        type: string
     type: object
   dto.ProductDetail:
     properties:
@@ -62,6 +64,8 @@ definitions:
         items:
           $ref: '#/definitions/dto.ProductImage'
         type: array
+      main_image:
+        type: string
       name:
         type: string
       price:
@@ -71,7 +75,7 @@ definitions:
       short:
         type: string
       spec:
-        type: integer
+        type: string
       specification:
         $ref: '#/definitions/dto.Specification'
       tags:

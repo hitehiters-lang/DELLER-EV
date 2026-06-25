@@ -38,6 +38,7 @@ func ConvertProducts(p []schema.Products) dto.ProductsResponse {
 			Price:             e.Price,
 			Discount:          e.Discount,
 			PriceWithDiscount: pwd,
+			MainImage:         e.MainImage,
 		}
 		prod = append(prod, uct)
 		total++
@@ -49,7 +50,7 @@ func ConvertProducts(p []schema.Products) dto.ProductsResponse {
 }
 
 func ConvertProductDetail(p schema.Products, v []dto.ProductImage) dto.ProductDetail {
-	pwd := p.Price - (p.Price * (p.Discount / 100))
+	pwd := p.Price - int(float64(p.Price)*(float64(p.Discount)/100))
 	var spec dto.Specification
 	if p.Specification != nil {
 		spec = dto.Specification{
@@ -85,6 +86,7 @@ func ConvertProductDetail(p schema.Products, v []dto.ProductImage) dto.ProductDe
 		UpdatedAt:         p.UpdatedAt,
 		DeletedAt:         p.DeletedAt,
 		PriceWithDiscount: pwd,
+		MainImage:         p.MainImage,
 		Specification:     spec,
 		Images:            v,
 	}
@@ -102,7 +104,6 @@ func GetImages(i []schema.ProductImages) []dto.ProductImage {
 		img = dto.ProductImage{
 			Id:        e.Id,
 			ProductId: e.ProductId,
-			IsMain:    e.IsMain,
 			ImagePath: url_path,
 		}
 		res = append(res, img)
@@ -120,7 +121,6 @@ func GetMainImage(i schema.ProductImages) dto.ProductImage {
 	img = dto.ProductImage{
 		Id:        i.Id,
 		ProductId: i.ProductId,
-		IsMain:    i.IsMain,
 		ImagePath: url_path,
 	}
 

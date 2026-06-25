@@ -13,20 +13,21 @@ type Category struct {
 }
 
 type Product struct {
-	Id                string `json:"id"`
-	CategoryId        string `json:"category_id"`
-	Spec              int    `json:"spec"`
-	Name              string `json:"name"`
-	Short             string `json:"short"`
-	Price             int    `json:"price"`
-	Discount          int    `json:"discount"`
-	PriceWithDiscount int    `json:"price_with_discount"`
+	Id                string    `json:"id"`
+	CategoryId        string    `json:"category_id"`
+	Spec              uuid.UUID `json:"spec"`
+	Name              string    `json:"name"`
+	Short             string    `json:"short"`
+	Price             int       `json:"price"`
+	Discount          int       `json:"discount"`
+	PriceWithDiscount int       `json:"price_with_discount"`
+	MainImage         string    `json:"main_image"`
 }
 
 type ProductDetail struct {
 	Id                string         `json:"id"`
 	CategoryId        string         `json:"category_id"`
-	Spec              int            `json:"spec"`
+	Spec              uuid.UUID      `json:"spec"`
 	Name              string         `json:"name"`
 	Short             string         `json:"short"`
 	Description       string         `json:"description"`
@@ -37,6 +38,7 @@ type ProductDetail struct {
 	UpdatedAt         time.Time      `json:"updated_at"`
 	DeletedAt         time.Time      `json:"deleted_at"`
 	PriceWithDiscount int            `json:"price_with_discount"`
+	MainImage         string         `json:"main_image"`
 	Specification     Specification  `json:"specification"`
 	Images            []ProductImage `json:"images"`
 }

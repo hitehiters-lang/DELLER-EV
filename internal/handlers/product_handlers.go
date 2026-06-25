@@ -62,7 +62,6 @@ func GetProducts(c *gin.Context) {
 		service.ErrorResponse(c, 404, "Ни одного продукта по заданной категории не найдено")
 		return
 	}
-
 	res := service.ConvertProducts(sch)
 
 	c.JSON(200, res)
@@ -96,7 +95,7 @@ func GetProductByID(c *gin.Context) {
 		service.ErrorResponse(c, 404, "Ни одного продукта по заданному id не найдено")
 		return
 	}
-	err, count, imgs := repository.GetProductPictures(c, prod_id)
+	imgs := repository.GetProductPictures(c, prod_id)
 
 	img_arr := service.GetImages(imgs)
 	res := service.ConvertProductDetail(prod, img_arr)
