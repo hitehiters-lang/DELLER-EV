@@ -29,8 +29,6 @@ definitions:
     properties:
       token:
         type: string
-      type:
-        type: string
     type: object
   dto.LoginBody:
     properties:
@@ -154,11 +152,24 @@ definitions:
       weight:
         type: string
     type: object
+  dto.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      is_admin:
+        type: boolean
+      name:
+        type: string
+    type: object
 info:
   contact: {}
   description: Документация к API.
   title: Deller-Ev API
-  version: "0.1"
+  version: "0.2"
 paths:
   /auth/login:
     post:
@@ -184,15 +195,41 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/dto.ErrorMessage'
-        "404":
-          description: Not Found
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Вход
+      tags:
+      - Аутентификация
+  /auth/me:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает информацию о своём профиле.
+      operationId: me
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/dto.ErrorMessage'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorMessage'
-      summary: Вход
+      security:
+      - BearerAuth: []
+      summary: Мой профиль
       tags:
       - Аутентификация
   /categories:

@@ -4,7 +4,7 @@
         "description": "Документация к API.",
         "title": "Deller-Ev API",
         "contact": {},
-        "version": "0.1"
+        "version": "0.2"
     },
     "basePath": "/",
     "paths": {
@@ -46,8 +46,49 @@
                             "$ref": "#/definitions/dto.ErrorMessage"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Возвращает информацию о своём профиле.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Аутентификация"
+                ],
+                "summary": "Мой профиль",
+                "operationId": "me",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorMessage"
                         }
@@ -301,9 +342,6 @@
             "properties": {
                 "token": {
                     "type": "string"
-                },
-                "type": {
-                    "type": "string"
                 }
             }
         },
@@ -489,6 +527,26 @@
                     "type": "string"
                 },
                 "weight": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.User": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_admin": {
+                    "type": "boolean"
+                },
+                "name": {
                     "type": "string"
                 }
             }

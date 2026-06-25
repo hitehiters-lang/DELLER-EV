@@ -5,6 +5,7 @@ import (
 	"deller/internal/config"
 	"deller/internal/database"
 	"deller/internal/handlers"
+	pkgauth "deller/internal/pkg/auth"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -20,7 +21,7 @@ import (
 // @description Введите JWT токен
 
 // @title Deller-Ev API
-// @version 0.1
+// @version 0.2
 // @description Документация к API.
 // @BasePath /
 func main() {
@@ -41,6 +42,12 @@ func main() {
 		api.GET("/products/:id/relative", handlers.GetProductsByTag)
 
 		api.POST("/auth/login", handlers.LogIn)
+
+		auth := api.Group("")
+		auth.Use(pkgauth.JWTAuthMiddleware())
+		{
+			auth.GET("/auth/me", handlers.Me)
+		}
 	}
 
 	docs.SwaggerInfo.BasePath = "/api/v1"

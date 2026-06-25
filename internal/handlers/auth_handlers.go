@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"deller/internal/dto"
+	pkgauth "deller/internal/pkg/auth"
 	"deller/internal/repository"
 	"deller/internal/service"
 	"errors"
@@ -47,6 +48,37 @@ func LogIn(c *gin.Context) {
 	}
 
 	res := service.LoginUser(user.Id)
+
+	c.JSON(200, res)
+}
+
+// @Tags Аутентификация
+// @Summary Мой профиль
+// @Description Возвращает информацию о своём профиле.
+// @ID me
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} dto.User
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 401 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /auth/me [get]
+func Me(c *gin.Context) {
+
+	self_user, err := pkgauth.GetCurrentUser(c)
+
+	user, err := repository.GetUserByID(c, self_user.Id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			service.ErrorResponse(c, 400, "Пользователя не существует")
+			return
+		}
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
+
+	res := service.ConvertUser(user)
 
 	c.JSON(200, res)
 }

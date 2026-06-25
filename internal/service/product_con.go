@@ -53,23 +53,24 @@ func ConvertProductDetail(p schema.Products, v []dto.ProductImage) dto.ProductDe
 	pwd := p.Price - int(float64(p.Price)*(float64(p.Discount)/100))
 	var spec dto.Specification
 	if p.Specification != nil {
+		s := p.Specification
 		spec = dto.Specification{
-			Id:                 p.Specification.Id,
-			Gear:               p.Specification.Gear,
-			PowerRatedMax:      p.Specification.PowerRatedMax,
-			TorqueMoment:       p.Specification.TorqueMoment,
-			MaxSpeed:           p.Specification.MaxSpeed,
-			Battery:            p.Specification.Battery,
-			PowerReserve:       p.Specification.PowerReserve,
-			Weight:             p.Specification.Weight,
-			LoadCap:            p.Specification.LoadCap,
-			DimensionsLWH:      p.Specification.DimensionsLWH,
-			SeatHeight:         p.Specification.SeatHeight,
-			Tires:              p.Specification.Tires,
-			Break:              p.Specification.Break,
-			Clearance:          p.Specification.Clearance,
-			Charging:           p.Specification.Charging,
-			MoistureProtection: p.Specification.MoistureProtection,
+			Id:                 s.Id,
+			Gear:               s.Gear,
+			PowerRatedMax:      s.PowerRatedMax,
+			TorqueMoment:       s.TorqueMoment,
+			MaxSpeed:           s.MaxSpeed,
+			Battery:            s.Battery,
+			PowerReserve:       s.PowerReserve,
+			Weight:             s.Weight,
+			LoadCap:            s.LoadCap,
+			DimensionsLWH:      s.DimensionsLWH,
+			SeatHeight:         s.SeatHeight,
+			Tires:              s.Tires,
+			Break:              s.Break,
+			Clearance:          s.Clearance,
+			Charging:           s.Charging,
+			MoistureProtection: s.MoistureProtection,
 		}
 	}
 	product := dto.ProductDetail{
@@ -98,7 +99,7 @@ func GetImages(i []schema.ProductImages) []dto.ProductImage {
 
 	for _, e := range i {
 		file_name := filepath.Base(e.ImagePath)
-		url_path := "/api/v1/images/" + file_name
+		url_path := "/images/" + file_name
 
 		var img dto.ProductImage
 		img = dto.ProductImage{

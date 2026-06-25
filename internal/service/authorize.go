@@ -3,6 +3,7 @@ package service
 import (
 	"deller/internal/dto"
 	pkgauth "deller/internal/pkg/auth"
+	"deller/internal/schema"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -22,7 +23,17 @@ func LoginUser(id uuid.UUID) dto.JWTResponse {
 		return dto.JWTResponse{}
 	}
 	return dto.JWTResponse{
-		Token: jwt,
-		Type:  "bearer",
+		Token: "Bearer " + jwt,
 	}
+}
+
+func ConvertUser(u schema.Users) dto.User {
+	user := dto.User{
+		Id:        u.Id,
+		Name:      u.Name,
+		Email:     u.Email,
+		IsAdmin:   u.IsAdmin,
+		CreatedAt: u.CreatedAt,
+	}
+	return user
 }
