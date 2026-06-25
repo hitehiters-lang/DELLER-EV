@@ -13,6 +13,7 @@ type Config struct {
 	DatabasePass string
 	DatabaseName string
 	ServerPort   string
+	JwtSecret    string
 }
 
 var cfg Config
@@ -26,6 +27,7 @@ func LoadENV() {
 	cfg.DatabasePass = os.Getenv("PASSWORD")
 	cfg.DatabaseName = os.Getenv("DB_NAME")
 	cfg.ServerPort = os.Getenv("SERVER_PORT")
+	cfg.JwtSecret = os.Getenv("JWT_SECRET")
 
 	if cfg.DatabaseHost == "" {
 		cfg.DatabaseHost = "localhost"
@@ -55,5 +57,8 @@ func GetSQL() (string, string, string, string, string) {
 		cfg.DatabaseName
 }
 func GetServer() string {
+	return cfg.ServerPort
+}
+func GetJwt() string {
 	return cfg.ServerPort
 }

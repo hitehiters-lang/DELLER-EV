@@ -25,6 +25,20 @@ definitions:
       message:
         type: string
     type: object
+  dto.JWTResponse:
+    properties:
+      token:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.LoginBody:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
   dto.Product:
     properties:
       category_id:
@@ -146,6 +160,41 @@ info:
   title: Deller-Ev API
   version: "0.1"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Вход по логину (email/name) и паролю. Возвращает JWT.
+      operationId: log_in
+      parameters:
+      - description: Данные для входа
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.JWTResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Вход
+      tags:
+      - Аутентификация
   /categories:
     get:
       consumes:

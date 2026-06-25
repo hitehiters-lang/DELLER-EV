@@ -39,6 +39,8 @@ func main() {
 
 		api.GET("/products/:id", handlers.GetProductByID)
 		api.GET("/products/:id/relative", handlers.GetProductsByTag)
+
+		api.POST("/auth/login", handlers.LogIn)
 	}
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
