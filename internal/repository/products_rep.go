@@ -197,3 +197,12 @@ func AddProduct(c *gin.Context, body dto.AddProductBody) (schema.Products, error
 	}
 	return new_product, nil
 }
+
+func DeleteProduct(c *gin.Context, prod string) error {
+	var del_prod schema.Products
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	_, err := db.NewDelete().Model(&del_prod).Where("id = ?", prod).Exec(ctx)
+	return err
+}

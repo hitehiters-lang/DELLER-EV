@@ -52,6 +52,7 @@ func main() {
 			auth.POST("/admin/categories", handlers.AddCategory)
 			auth.DELETE("/admin/categories/:id", handlers.DelCategory)
 			auth.POST("/admin/products", handlers.AddProduct)
+			auth.DELETE("/admin/products/:id", handlers.DelProduct)
 		}
 	}
 

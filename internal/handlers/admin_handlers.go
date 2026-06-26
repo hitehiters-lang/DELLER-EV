@@ -146,6 +146,10 @@ func DelCategory(c *gin.Context) {
 	}
 
 	err = repository.DeleteCategory(c, category)
+	if err != nil {
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
 	c.JSON(200, dto.Message{
 		Code:    200,
 		Message: "Категория " + category + " успешно удалена",
@@ -198,5 +202,53 @@ func AddProduct(c *gin.Context) {
 		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
 		return
 	}
-	service.ErrorResponse(c, 409, "Категория уже существует")
+	service.ErrorResponse(c, 409, "Товар уже существует")
+}
+
+// @Tags Админ
+// @Summary Удалить товар
+// @ID del_products
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "id товара"
+// @Success 200 {object} dto.Message
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/products/{id} [delete]
+func DelProduct(c *gin.Context) {
+
+	r, err := pkgauth.GetCurrentRights(c)
+	if r != "a" && r != "r" {
+		service.ErrorResponse(c, 403, "Недостаточно прав")
+		return
+	}
+
+	product := c.Param("id")
+	if product == "" {
+		service.ErrorResponse(c, 400, "Товар не указан")
+		return
+	}
+
+	err = repository.CheckProduct(c, product)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			service.ErrorResponse(c, 404, "Товара не существует")
+			return
+		}
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
+
+	err = repository.DeleteProduct(c, product)
+	if err != nil {
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
+	c.JSON(200, dto.Message{
+		Code:    200,
+		Message: "Товар " + product + " успешно удалён",
+	})
 }

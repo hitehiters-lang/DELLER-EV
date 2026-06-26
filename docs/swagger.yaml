@@ -418,6 +418,45 @@ paths:
       summary: Создать новый товар
       tags:
       - Админ
+  /admin/products/{id}:
+    delete:
+      consumes:
+      - application/json
+      operationId: del_products
+      parameters:
+      - description: id товара
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Удалить товар
+      tags:
+      - Админ
   /auth/login:
     post:
       consumes:
