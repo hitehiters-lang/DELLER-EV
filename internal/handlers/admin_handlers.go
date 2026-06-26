@@ -188,7 +188,7 @@ func AddProduct(c *gin.Context) {
 		if errors.Is(err, sql.ErrNoRows) {
 			new_product, err := repository.AddProduct(c, body)
 			if err != nil {
-				service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+				service.ErrorResponse(c, 400, "Ошибка сервера: "+err.Error())
 				return
 			}
 			_, _, prod := repository.GetProductDetail(c, new_product.Id)
@@ -250,5 +250,60 @@ func DelProduct(c *gin.Context) {
 	c.JSON(200, dto.Message{
 		Code:    200,
 		Message: "Товар " + product + " успешно удалён",
+	})
+}
+
+// @Tags Админ
+// @Summary Изменить товар
+// @ID put_product
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "id товара"
+// @Param login body dto.AddProductBody true "Данные товара"
+// @Success 201 {object} dto.ProductDetail
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/products/{id} [put]
+func PutProduct(c *gin.Context) {
+
+	r, err := pkgauth.GetCurrentRights(c)
+	if r != "a" && r != "r" {
+		service.ErrorResponse(c, 403, "Недостаточно прав")
+		return
+	}
+
+	var body dto.PutProductBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		service.ErrorResponse(c, 400, "Плохой запрос")
+		return
+	}
+
+	product := c.Param("id")
+	if product == "" {
+		service.ErrorResponse(c, 400, "Товар не указан")
+		return
+	}
+
+	err = repository.CheckProduct(c, product)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			service.ErrorResponse(c, 404, "Товара не существует")
+			return
+		}
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
+
+	err = repository.PutProduct(c, body, product)
+	if err != nil {
+		service.ErrorResponse(c, 400, "Ошибка: "+err.Error())
+		return
+	}
+	c.JSON(200, dto.Message{
+		Code:    200,
+		Message: "Товар " + product + " успешно изменён",
 	})
 }

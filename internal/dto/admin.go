@@ -43,3 +43,14 @@ type AdditionalSpec struct {
 	Charging           string `json:"charging"`
 	MoistureProtection string `json:"moisture_protection"`
 }
+type PutProductBody struct {
+	CategoryId    string         `json:"category_id"`
+	Name          string         `json:"name"`
+	Short         string         `json:"short"`
+	Description   string         `json:"description"`
+	Price         int            `json:"price"`
+	Discount      int            `json:"discount"`
+	Tags          []string       `json:"tags"`
+	MainImage     string         `json:"main_image" example:"/images/example.png"`
+	Specification AdditionalSpec `json:"specification"`
+}

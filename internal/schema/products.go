@@ -25,8 +25,8 @@ type Products struct {
 	Discount    int       `bun:"discount"`
 	Tags        []string  `bun:"tags,array"`
 	CreatedAt   time.Time `bun:"created_at"`
-	UpdatedAt   time.Time `bun:"updated_at"`
-	DeletedAt   time.Time `bun:"deleted_at"`
+	UpdatedAt   time.Time `bun:"updated_at,nullzero"`
+	DeletedAt   time.Time `bun:"deleted_at,nullzero"`
 	MainImage   string    `bun:"main_image"`
 
 	Specification *MotoSpecifications `bun:"rel:belongs-to,join:spec=id"`

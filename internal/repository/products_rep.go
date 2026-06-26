@@ -4,6 +4,7 @@ import (
 	"deller/internal/database"
 	"deller/internal/dto"
 	"deller/internal/schema"
+	"errors"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -20,7 +21,7 @@ func GetCategories(c *gin.Context) (error, int, []schema.Categories) {
 	count, err := db.NewSelect().Model(&categories).
 		ColumnExpr("categories.*").
 		ColumnExpr("COUNT(p.id) AS products_count").
-		Join("LEFT JOIN products AS p ON p.category_id = categories.id").
+		Join("LEFT JOIN products AS p ON p.category_id = categories.id AND p.deleted_at IS NULL").
 		Group("categories.id").
 		ScanAndCount(ctx)
 	return err, count, categories
@@ -34,7 +35,7 @@ func SelectProductsByCategory(c *gin.Context, cat_id string) (error, int, []sche
 	count, err := db.NewSelect().
 		Model(&products).
 		Where("category_id = ?", cat_id).
-		Where("deleted_at < ?", time.Now()).
+		Where("deleted_at IS NULL", time.Now()).
 		ScanAndCount(ctx)
 	return err, count, products
 }
@@ -44,7 +45,8 @@ func GetProductDetail(c *gin.Context, prod_id string) (error, int, schema.Produc
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
-	count, err := db.NewSelect().Model(&product).Relation("Specification").Where("products.id = ?", prod_id).ScanAndCount(ctx)
+	count, err := db.NewSelect().Model(&product).Relation("Specification").Where("products.id = ?", prod_id).
+		Where("deleted_at IS NULL", time.Now()).ScanAndCount(ctx)
 	return err, count, product
 }
 
@@ -54,14 +56,14 @@ func GetProductsByTag(c *gin.Context, prod_id string) (error, int, []schema.Prod
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
-	count, err := db.NewSelect().Model(&product).Where("products.id = ?", prod_id).ScanAndCount(ctx)
+	count, err := db.NewSelect().Model(&product).Where("products.id = ?", prod_id).Where("deleted_at IS NULL", time.Now()).ScanAndCount(ctx)
 	if err != nil || count == 0 {
 		return err, count, related_products
 	}
 
 	tags := product.Tags
 	count, err = db.NewSelect().Model(&related_products).Where("products.tags && ?", pgdialect.Array(tags)).
-		OrderExpr("RANDOM()").Limit(4).Where("products.id != ?", prod_id).ScanAndCount(ctx)
+		OrderExpr("RANDOM()").Limit(4).Where("products.id != ?", prod_id).Where("deleted_at IS NULL", time.Now()).ScanAndCount(ctx)
 	if count < 4 {
 		var added_products []schema.Products
 		needed := 4 - count
@@ -132,7 +134,7 @@ func CheckProduct(c *gin.Context, prod_id string) error {
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
-	err := db.NewSelect().Model(&products).Where("id = ?", prod_id).Scan(ctx)
+	err := db.NewSelect().Model(&products).Where("id = ?", prod_id).Where("deleted_at IS NULL", time.Now()).Scan(ctx)
 	return err
 }
 
@@ -199,10 +201,80 @@ func AddProduct(c *gin.Context, body dto.AddProductBody) (schema.Products, error
 }
 
 func DeleteProduct(c *gin.Context, prod string) error {
-	var del_prod schema.Products
+	del_prod := schema.Products{
+		DeletedAt: time.Now(),
+	}
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
-	_, err := db.NewDelete().Model(&del_prod).Where("id = ?", prod).Exec(ctx)
+	_, err := db.NewUpdate().Model(&del_prod).Where("id = ?", prod).Column("deleted_at").Exec(ctx)
 	return err
+}
+
+func PutProduct(c *gin.Context, body dto.PutProductBody, id string) error {
+	s := body.Specification
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	var prod schema.Products
+	err := db.NewSelect().Model(&prod).Relation("Specification").Where("products.id = ?", id).Scan(ctx)
+	if err != nil {
+		return err
+	}
+
+	if prod.Spec == uuid.Nil {
+		return errors.New("product has no specification")
+	}
+
+	new_specs := schema.MotoSpecifications{
+		Id:                 prod.Spec,
+		Gear:               s.Gear,
+		PowerRatedMax:      s.PowerRatedMax,
+		TorqueMoment:       s.TorqueMoment,
+		MaxSpeed:           s.MaxSpeed,
+		Battery:            s.Battery,
+		PowerReserve:       s.PowerReserve,
+		Weight:             s.Weight,
+		LoadCap:            s.LoadCap,
+		DimensionsLWH:      s.DimensionsLWH,
+		SeatHeight:         s.SeatHeight,
+		Tires:              s.Tires,
+		Break:              s.Break,
+		Clearance:          s.Clearance,
+		Charging:           s.Charging,
+		MoistureProtection: s.MoistureProtection,
+	}
+	new_product := schema.Products{
+		Id:          prod.Id,
+		CategoryId:  body.CategoryId,
+		Spec:        prod.Spec,
+		Name:        body.Name,
+		Short:       body.Short,
+		Description: body.Description,
+		Price:       body.Price,
+		Discount:    body.Discount,
+		Tags:        body.Tags,
+		CreatedAt:   prod.CreatedAt,
+		UpdatedAt:   time.Now(),
+		MainImage:   body.MainImage,
+	}
+
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	_, err = tx.NewUpdate().Model(&new_specs).Where("id = ?", prod.Spec).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = tx.NewUpdate().Model(&new_product).WherePK().ExcludeColumn("spec").Exec(ctx)
+	if err != nil {
+		return err
+	}
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+	return nil
 }

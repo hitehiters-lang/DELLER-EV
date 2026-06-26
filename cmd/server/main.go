@@ -49,10 +49,13 @@ func main() {
 			auth.GET("/auth/me", handlers.Me)
 
 			auth.POST("/admin/images", handlers.AddPicture)
+
 			auth.POST("/admin/categories", handlers.AddCategory)
 			auth.DELETE("/admin/categories/:id", handlers.DelCategory)
+
 			auth.POST("/admin/products", handlers.AddProduct)
 			auth.DELETE("/admin/products/:id", handlers.DelProduct)
+			auth.PUT("/admin/products/:id", handlers.PutProduct)
 		}
 	}
 
