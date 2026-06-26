@@ -207,6 +207,76 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/image-bind": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Сохраняет картинку в статику. Прикрепляет эту картинку к товару.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Админ"
+                ],
+                "summary": "Прикрепить картинку",
+                "operationId": "bind_picture",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "PNG изображение",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Имя изображения",
+                        "name": "image_name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "id товара",
+                        "name": "product_id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UploadMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/images": {
             "post": {
                 "security": [
@@ -1026,9 +1096,6 @@ const docTemplate = `{
                 },
                 "image_path": {
                     "type": "string"
-                },
-                "is_main": {
-                    "type": "boolean"
                 },
                 "product_id": {
                     "type": "string"

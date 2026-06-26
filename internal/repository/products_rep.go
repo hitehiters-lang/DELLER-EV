@@ -35,7 +35,7 @@ func SelectProductsByCategory(c *gin.Context, cat_id string) (error, int, []sche
 	count, err := db.NewSelect().
 		Model(&products).
 		Where("category_id = ?", cat_id).
-		Where("deleted_at IS NULL", time.Now()).
+		Where("deleted_at IS NULL").
 		ScanAndCount(ctx)
 	return err, count, products
 }
@@ -46,7 +46,7 @@ func GetProductDetail(c *gin.Context, prod_id string) (error, int, schema.Produc
 
 	db := database.GetDatabase()
 	count, err := db.NewSelect().Model(&product).Relation("Specification").Where("products.id = ?", prod_id).
-		Where("deleted_at IS NULL", time.Now()).ScanAndCount(ctx)
+		Where("deleted_at IS NULL").ScanAndCount(ctx)
 	return err, count, product
 }
 
@@ -56,14 +56,14 @@ func GetProductsByTag(c *gin.Context, prod_id string) (error, int, []schema.Prod
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
-	count, err := db.NewSelect().Model(&product).Where("products.id = ?", prod_id).Where("deleted_at IS NULL", time.Now()).ScanAndCount(ctx)
+	count, err := db.NewSelect().Model(&product).Where("products.id = ?", prod_id).Where("deleted_at IS NULL").ScanAndCount(ctx)
 	if err != nil || count == 0 {
 		return err, count, related_products
 	}
 
 	tags := product.Tags
 	count, err = db.NewSelect().Model(&related_products).Where("products.tags && ?", pgdialect.Array(tags)).
-		OrderExpr("RANDOM()").Limit(4).Where("products.id != ?", prod_id).Where("deleted_at IS NULL", time.Now()).ScanAndCount(ctx)
+		OrderExpr("RANDOM()").Limit(4).Where("products.id != ?", prod_id).Where("deleted_at IS NULL").ScanAndCount(ctx)
 	if count < 4 {
 		var added_products []schema.Products
 		needed := 4 - count
@@ -134,7 +134,7 @@ func CheckProduct(c *gin.Context, prod_id string) error {
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
-	err := db.NewSelect().Model(&products).Where("id = ?", prod_id).Where("deleted_at IS NULL", time.Now()).Scan(ctx)
+	err := db.NewSelect().Model(&products).Where("id = ?", prod_id).Where("deleted_at IS NULL").Scan(ctx)
 	return err
 }
 
@@ -293,4 +293,29 @@ func PutCategory(c *gin.Context, body dto.PutCategoryBody, id string) error {
 		return err
 	}
 	return nil
+}
+
+func BindPicture(c *gin.Context, image_name, product_id string) (uuid.UUID, error) {
+	pic_uuid, _ := uuid.NewV7()
+	picture := schema.ProductImages{
+		Id:        pic_uuid,
+		ProductId: product_id,
+		ImagePath: "/images/" + image_name,
+	}
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	_, err := db.NewInsert().Model(&picture).Exec(ctx)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return pic_uuid, nil
+}
+
+func DeletePicture(c *gin.Context, pic_uuid uuid.UUID) {
+	var del_img schema.ProductImages
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	db.NewDelete().Model(&del_img).Where("id = ?", pic_uuid).Exec(ctx)
 }

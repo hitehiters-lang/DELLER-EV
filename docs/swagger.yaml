@@ -180,8 +180,6 @@ definitions:
         type: string
       image_path:
         type: string
-      is_main:
-        type: boolean
       product_id:
         type: string
     type: object
@@ -387,6 +385,52 @@ paths:
       security:
       - BearerAuth: []
       summary: Изменить категорию
+      tags:
+      - Админ
+  /admin/image-bind:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Сохраняет картинку в статику. Прикрепляет эту картинку к товару.
+      operationId: bind_picture
+      parameters:
+      - description: PNG изображение
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Имя изображения
+        in: formData
+        name: image_name
+        required: true
+        type: string
+      - description: id товара
+        in: formData
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.UploadMessage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Прикрепить картинку
       tags:
       - Админ
   /admin/images:

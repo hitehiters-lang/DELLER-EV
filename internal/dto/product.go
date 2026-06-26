@@ -76,6 +76,5 @@ type ProductsResponse struct {
 type ProductImage struct {
 	Id        uuid.UUID `json:"id"`
 	ProductId string    `json:"product_id"`
-	IsMain    bool      `json:"is_main"`
 	ImagePath string    `json:"image_path"`
 }

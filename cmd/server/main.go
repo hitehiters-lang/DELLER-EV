@@ -49,6 +49,7 @@ func main() {
 			auth.GET("/auth/me", handlers.Me)
 
 			auth.POST("/admin/images", handlers.AddPicture)
+			auth.POST("/admin/image-bind", handlers.BindPicture)
 
 			auth.POST("/admin/categories", handlers.AddCategory)
 			auth.DELETE("/admin/categories/:id", handlers.DelCategory)
