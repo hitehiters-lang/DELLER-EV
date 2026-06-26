@@ -194,6 +194,15 @@ definitions:
       total:
         type: integer
     type: object
+  dto.PutCategoryBody:
+    properties:
+      id:
+        type: string
+      image_name:
+        type: string
+      name:
+        type: string
+    type: object
   dto.Specification:
     properties:
       battery:
@@ -255,7 +264,7 @@ info:
   contact: {}
   description: Документация к API.
   title: Deller-Ev API
-  version: "0.3"
+  version: "0.4"
 paths:
   /admin/categories:
     post:
@@ -334,6 +343,50 @@ paths:
       security:
       - BearerAuth: []
       summary: Удалить категорию
+      tags:
+      - Админ
+    put:
+      consumes:
+      - application/json
+      operationId: put_category
+      parameters:
+      - description: id категории
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Данные товара
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PutCategoryBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProductDetail'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Изменить категорию
       tags:
       - Админ
   /admin/images:

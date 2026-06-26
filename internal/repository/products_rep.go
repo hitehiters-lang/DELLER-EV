@@ -278,3 +278,19 @@ func PutProduct(c *gin.Context, body dto.PutProductBody, id string) error {
 	}
 	return nil
 }
+
+func PutCategory(c *gin.Context, body dto.PutCategoryBody, id string) error {
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	upd_cat := schema.Categories{
+		Id:        body.Id,
+		Name:      body.Name,
+		ImagePath: "/images/" + body.Name + ".png",
+	}
+	_, err := db.NewUpdate().Model(&upd_cat).Where("id = ?", id).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}

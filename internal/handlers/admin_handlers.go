@@ -307,3 +307,58 @@ func PutProduct(c *gin.Context) {
 		Message: "Товар " + product + " успешно изменён",
 	})
 }
+
+// @Tags Админ
+// @Summary Изменить категорию
+// @ID put_category
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "id категории"
+// @Param login body dto.PutCategoryBody true "Данные товара"
+// @Success 201 {object} dto.ProductDetail
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/categories/{id} [put]
+func PutCategory(c *gin.Context) {
+
+	r, err := pkgauth.GetCurrentRights(c)
+	if r != "a" && r != "r" {
+		service.ErrorResponse(c, 403, "Недостаточно прав")
+		return
+	}
+
+	var body dto.PutCategoryBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		service.ErrorResponse(c, 400, "Плохой запрос")
+		return
+	}
+
+	category := c.Param("id")
+	if category == "" {
+		service.ErrorResponse(c, 400, "Категория не указана")
+		return
+	}
+
+	err = repository.CheckCategory(c, category)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			service.ErrorResponse(c, 404, "Категории не существует")
+			return
+		}
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
+
+	err = repository.PutCategory(c, body, category)
+	if err != nil {
+		service.ErrorResponse(c, 400, "Ошибка: "+err.Error())
+		return
+	}
+	c.JSON(200, dto.Message{
+		Code:    200,
+		Message: "Категория " + category + " успешно изменена",
+	})
+}

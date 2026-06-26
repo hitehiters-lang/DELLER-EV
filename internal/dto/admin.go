@@ -54,3 +54,8 @@ type PutProductBody struct {
 	MainImage     string         `json:"main_image" example:"/images/example.png"`
 	Specification AdditionalSpec `json:"specification"`
 }
+type PutCategoryBody struct {
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	ImageName string `json:"image_name"`
+}
