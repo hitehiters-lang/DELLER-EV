@@ -3,7 +3,11 @@ package service
 import (
 	"deller/internal/dto"
 	"deller/internal/schema"
+	"errors"
+	"fmt"
+	"os"
 	"path/filepath"
+	"strings"
 )
 
 func ConvertCategories(p []schema.Categories) dto.CategoriesResponse {
@@ -122,4 +126,66 @@ func GetImages(i []schema.ProductImages) []dto.ProductImage {
 	}
 
 	return res
+}
+
+func GenerateUniqueFileName(name string) (string, error) {
+	sharedDir := "./shared"
+
+	cleanName := filepath.Clean(name)
+	if strings.Contains(cleanName, "..") {
+		return "", errors.New("invalid file name: path traversal detected")
+	}
+
+	absDir, err := filepath.Abs(sharedDir)
+	if err != nil {
+		return "", fmt.Errorf("failed to get abs dir: %w", err)
+	}
+
+	ext := filepath.Ext(cleanName)
+	base := strings.TrimSuffix(cleanName, ext)
+
+	checkPath := func(candidate string) (bool, error) {
+		fullPath := filepath.Join(sharedDir, candidate)
+		absPath, err := filepath.Abs(fullPath)
+		if err != nil {
+			return false, fmt.Errorf("failed to get abs path: %w", err)
+		}
+		if !strings.HasPrefix(absPath, absDir+string(os.PathSeparator)) && absPath != absDir {
+			return false, errors.New("invalid file path: escaped shared directory")
+		}
+
+		info, err := os.Stat(fullPath)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				return false, nil
+			}
+			return false, fmt.Errorf("failed to stat file: %w", err)
+		}
+		if info.IsDir() {
+			return false, nil
+		}
+		return true, nil
+	}
+
+	exists, err := checkPath(cleanName)
+	if err != nil {
+		return "", err
+	}
+	if !exists {
+		return cleanName, nil
+	}
+
+	const maxAttempts = 10000
+	for i := 1; i <= maxAttempts; i++ {
+		candidate := fmt.Sprintf("%s_%d%s", base, i, ext)
+		exists, err := checkPath(candidate)
+		if err != nil {
+			return "", err
+		}
+		if !exists {
+			return candidate, nil
+		}
+	}
+
+	return "", errors.New("could not generate unique file name: too many attempts")
 }

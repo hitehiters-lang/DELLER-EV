@@ -49,7 +49,13 @@ func AddPicture(c *gin.Context) {
 		return
 	}
 
-	dst := "./shared/" + image_name + ".png"
+	core_name, err := service.GenerateUniqueFileName(image_name + ".png")
+	if err != nil {
+		service.ErrorResponse(c, 400, "Плохое название файла: "+err.Error())
+		return
+	}
+
+	dst := "./shared/" + core_name
 	if err := c.SaveUploadedFile(file, dst); err != nil {
 		service.ErrorResponse(c, 500, "Не удалось сохранить файл: "+err.Error())
 		return
@@ -58,10 +64,62 @@ func AddPicture(c *gin.Context) {
 	res := dto.UploadMessage{
 		Code:    201,
 		Message: "Файл успешно сохранён",
-		Link:    "/images/" + image_name + ".png",
+		Link:    "/images/" + core_name,
 	}
 	c.JSON(201, res)
 }
+
+// @Tags Админ
+// @Summary Сохранить картинку
+// @Description Сохраняет картинку в статику. Привязывает эту картинку к товару.
+// @ID bind_picture
+// @Security BearerAuth
+// @Accept multipart/form-data
+// @Produce json
+// @Param file formData file true "PNG изображение"
+// @Param image_name formData string true "Имя изображения"
+// @Param product_id formData string true "id товара"
+// @Success 201 {object} dto.UploadMessage
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/image-bind [post]
+// func Picture(c *gin.Context) {
+
+// 	r, err := pkgauth.GetCurrentRights(c)
+// 	if r != "a" && r != "r" {
+// 		service.ErrorResponse(c, 403, "Недостаточно прав")
+// 		return
+// 	}
+
+// 	image_name := c.PostForm("image_name")
+// 	product_id := c.PostForm("product_id")
+
+// 	file, err := c.FormFile("file")
+// 	if err != nil {
+// 		service.ErrorResponse(c, 400, "Нет файла")
+// 		return
+// 	}
+
+// 	ext := strings.ToLower(filepath.Ext(file.Filename))
+// 	if ext != ".png" {
+// 		service.ErrorResponse(c, 400, "Неправильное расширение файла")
+// 		return
+// 	}
+
+// 	dst := "./shared/" + image_name + ".png"
+// 	if err := c.SaveUploadedFile(file, dst); err != nil {
+// 		service.ErrorResponse(c, 500, "Не удалось сохранить файл: "+err.Error())
+// 		return
+// 	}
+
+// 	res := dto.UploadMessage{
+// 		Code:    201,
+// 		Message: "Файл успешно сохранён",
+// 		Link:    "/images/" + image_name + ".png",
+// 	}
+// 	c.JSON(201, res)
+// }
 
 // @Tags Админ
 // @Summary Создать новую категорию
