@@ -5,7 +5,7 @@ import (
 )
 
 type MotoSpecifications struct {
-	Id                 uuid.UUID `bun:"id,pk,autoincrement"`
+	Id                 uuid.UUID `bun:"id,pk"`
 	Gear               string    `bun:"gear"`
 	PowerRatedMax      string    `bun:"power_rated_max"`
 	TorqueMoment       string    `bun:"torque_moment"`

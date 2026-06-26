@@ -9,6 +9,65 @@ definitions:
       name:
         type: string
     type: object
+  dto.AddProductBody:
+    properties:
+      category_id:
+        type: string
+      description:
+        type: string
+      discount:
+        type: integer
+      id:
+        type: string
+      main_image:
+        example: /images/example.png
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      short:
+        type: string
+      specification:
+        $ref: '#/definitions/dto.AdditionalSpec'
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.AdditionalSpec:
+    properties:
+      battery:
+        type: string
+      break:
+        type: string
+      charging:
+        type: string
+      clearance:
+        type: string
+      dimensions_l_w_h:
+        type: string
+      gear:
+        type: string
+      load_cap:
+        type: string
+      max_speed:
+        type: string
+      moisture_protection:
+        type: string
+      power_rated_max:
+        type: string
+      power_reserve:
+        type: string
+      seat_height:
+        type: string
+      tires:
+        type: string
+      torque_moment:
+        type: string
+      weight:
+        type: string
+    type: object
   dto.CategoriesResponse:
     properties:
       categories:
@@ -196,7 +255,7 @@ info:
   contact: {}
   description: Документация к API.
   title: Deller-Ev API
-  version: "0.2"
+  version: "0.3"
 paths:
   /admin/categories:
     post:
@@ -317,6 +376,46 @@ paths:
       security:
       - BearerAuth: []
       summary: Сохранить картинку
+      tags:
+      - Админ
+  /admin/products:
+    post:
+      consumes:
+      - application/json
+      operationId: add_product
+      parameters:
+      - description: Данные товара
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddProductBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProductDetail'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Создать новый товар
       tags:
       - Админ
   /auth/login:

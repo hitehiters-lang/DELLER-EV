@@ -123,18 +123,3 @@ func GetImages(i []schema.ProductImages) []dto.ProductImage {
 
 	return res
 }
-
-func GetMainImage(i schema.ProductImages) dto.ProductImage {
-
-	file_name := filepath.Base(i.ImagePath)
-	url_path := "/api/v1/images/" + file_name
-
-	var img dto.ProductImage
-	img = dto.ProductImage{
-		Id:        i.Id,
-		ProductId: i.ProductId,
-		ImagePath: url_path,
-	}
-
-	return img
-}

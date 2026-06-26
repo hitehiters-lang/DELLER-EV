@@ -79,9 +79,3 @@ type ProductImage struct {
 	IsMain    bool      `json:"is_main"`
 	ImagePath string    `json:"image_path"`
 }
-
-type AddCategoryBody struct {
-	Id        string `json:"id"`
-	Name      string `json:"name"`
-	ImageName string `json:"image_name"`
-}

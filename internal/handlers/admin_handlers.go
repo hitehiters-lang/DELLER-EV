@@ -30,7 +30,7 @@ import (
 func AddPicture(c *gin.Context) {
 
 	r, err := pkgauth.GetCurrentRights(c)
-	if r != "a" {
+	if r != "a" && r != "r" {
 		service.ErrorResponse(c, 403, "Недостаточно прав")
 		return
 	}
@@ -79,13 +79,12 @@ func AddPicture(c *gin.Context) {
 func AddCategory(c *gin.Context) {
 
 	r, err := pkgauth.GetCurrentRights(c)
-	if r != "a" {
+	if r != "a" && r != "r" {
 		service.ErrorResponse(c, 403, "Недостаточно прав")
 		return
 	}
 
 	var body dto.AddCategoryBody
-
 	if err := c.ShouldBindJSON(&body); err != nil {
 		service.ErrorResponse(c, 400, "Плохой запрос")
 		return
@@ -125,7 +124,7 @@ func AddCategory(c *gin.Context) {
 func DelCategory(c *gin.Context) {
 
 	r, err := pkgauth.GetCurrentRights(c)
-	if r != "a" {
+	if r != "a" && r != "r" {
 		service.ErrorResponse(c, 403, "Недостаточно прав")
 		return
 	}
@@ -151,4 +150,53 @@ func DelCategory(c *gin.Context) {
 		Code:    200,
 		Message: "Категория " + category + " успешно удалена",
 	})
+}
+
+// @Tags Админ
+// @Summary Создать новый товар
+// @ID add_product
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param login body dto.AddProductBody true "Данные товара"
+// @Success 201 {object} dto.ProductDetail
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 409 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/products [post]
+func AddProduct(c *gin.Context) {
+
+	r, err := pkgauth.GetCurrentRights(c)
+	if r != "a" && r != "r" {
+		service.ErrorResponse(c, 403, "Недостаточно прав")
+		return
+	}
+
+	var body dto.AddProductBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		service.ErrorResponse(c, 400, "Плохой запрос")
+		return
+	}
+
+	err = repository.CheckProduct(c, body.Id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			new_product, err := repository.AddProduct(c, body)
+			if err != nil {
+				service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+				return
+			}
+			_, _, prod := repository.GetProductDetail(c, new_product.Id)
+			imgs := repository.GetProductPictures(c, new_product.Id)
+			img_arr := service.GetImages(imgs)
+
+			res := service.ConvertProductDetail(prod, img_arr)
+			c.JSON(201, res)
+			return
+		}
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
+	service.ErrorResponse(c, 409, "Категория уже существует")
 }

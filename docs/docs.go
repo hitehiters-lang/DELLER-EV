@@ -202,6 +202,69 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/products": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Админ"
+                ],
+                "summary": "Создать новый товар",
+                "operationId": "add_product",
+                "parameters": [
+                    {
+                        "description": "Данные товара",
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddProductBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProductDetail"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "Вход по логину (email/name) и паролю. Возвращает JWT.",
@@ -506,6 +569,95 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.AddProductBody": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "discount": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "main_image": {
+                    "type": "string",
+                    "example": "/images/example.png"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "specification": {
+                    "$ref": "#/definitions/dto.AdditionalSpec"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "dto.AdditionalSpec": {
+            "type": "object",
+            "properties": {
+                "battery": {
+                    "type": "string"
+                },
+                "break": {
+                    "type": "string"
+                },
+                "charging": {
+                    "type": "string"
+                },
+                "clearance": {
+                    "type": "string"
+                },
+                "dimensions_l_w_h": {
+                    "type": "string"
+                },
+                "gear": {
+                    "type": "string"
+                },
+                "load_cap": {
+                    "type": "string"
+                },
+                "max_speed": {
+                    "type": "string"
+                },
+                "moisture_protection": {
+                    "type": "string"
+                },
+                "power_rated_max": {
+                    "type": "string"
+                },
+                "power_reserve": {
+                    "type": "string"
+                },
+                "seat_height": {
+                    "type": "string"
+                },
+                "tires": {
+                    "type": "string"
+                },
+                "torque_moment": {
+                    "type": "string"
+                },
+                "weight": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CategoriesResponse": {
             "type": "object",
             "properties": {
@@ -800,7 +952,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.2",
+	Version:          "0.3",
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},

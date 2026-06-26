@@ -21,7 +21,7 @@ import (
 // @description Введите JWT токен
 
 // @title Deller-Ev API
-// @version 0.2
+// @version 0.3
 // @description Документация к API.
 // @BasePath /
 func main() {
@@ -48,9 +48,10 @@ func main() {
 		{
 			auth.GET("/auth/me", handlers.Me)
 
+			auth.POST("/admin/images", handlers.AddPicture)
 			auth.POST("/admin/categories", handlers.AddCategory)
 			auth.DELETE("/admin/categories/:id", handlers.DelCategory)
-			auth.POST("/admin/images", handlers.AddPicture)
+			auth.POST("/admin/products", handlers.AddProduct)
 		}
 	}
 
