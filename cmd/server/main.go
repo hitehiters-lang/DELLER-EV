@@ -50,6 +50,7 @@ func main() {
 
 			auth.POST("/admin/images", handlers.AddPicture)
 			auth.POST("/admin/image-bind", handlers.BindPicture)
+			auth.DELETE("/admin/image-unbind", handlers.UnbindPicture)
 
 			auth.POST("/admin/categories", handlers.AddCategory)
 			auth.DELETE("/admin/categories/:id", handlers.DelCategory)

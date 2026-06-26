@@ -415,7 +415,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dto.UploadMessage'
+            $ref: '#/definitions/dto.ProductImage'
         "400":
           description: Bad Request
           schema:
@@ -431,6 +431,46 @@ paths:
       security:
       - BearerAuth: []
       summary: Прикрепить картинку
+      tags:
+      - Админ
+  /admin/image-unbind:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет картинку из БД. Не трогает её в статике.
+      operationId: unbind_picture
+      parameters:
+      - description: id изображения
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Открепить картинку
       tags:
       - Админ
   /admin/images:
@@ -472,7 +512,7 @@ paths:
             $ref: '#/definitions/dto.ErrorMessage'
       security:
       - BearerAuth: []
-      summary: Сохранить картинку
+      summary: Сохранить главную картинку
       tags:
       - Админ
   /admin/products:

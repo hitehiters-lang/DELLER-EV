@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"deller/internal/database"
 	"deller/internal/dto"
 	"deller/internal/schema"
@@ -75,7 +76,7 @@ func GetProductsByTag(c *gin.Context, prod_id string) (error, int, []schema.Prod
 
 		err = db.NewSelect().
 			Model(&added_products).
-			Where("products.id NOT IN ?", bun.Tuple(excludedIDs)).
+			Where("products.id NOT IN ? AND deleted_at IS NULL", bun.Tuple(excludedIDs)).
 			OrderExpr("RANDOM()").
 			Limit(needed).
 			Scan(ctx)
@@ -312,10 +313,18 @@ func BindPicture(c *gin.Context, image_name, product_id string) (uuid.UUID, erro
 	return pic_uuid, nil
 }
 
-func DeletePicture(c *gin.Context, pic_uuid uuid.UUID) {
+func DeletePicture(c *gin.Context, pic_uuid uuid.UUID) error {
 	var del_img schema.ProductImages
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
-	db.NewDelete().Model(&del_img).Where("id = ?", pic_uuid).Exec(ctx)
+	res, err := db.NewDelete().Model(&del_img).Where("id = ?", pic_uuid).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	rows, _ := res.RowsAffected()
+	if rows == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
 }

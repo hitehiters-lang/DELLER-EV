@@ -11,10 +11,11 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // @Tags Админ
-// @Summary Сохранить картинку
+// @Summary Сохранить главную картинку
 // @Description Сохраняет картинку в статику. Должно использоваться совместно с другими ручками, например добавления товара или категории.
 // @ID add_picture
 // @Security BearerAuth
@@ -79,7 +80,7 @@ func AddPicture(c *gin.Context) {
 // @Param file formData file true "PNG изображение"
 // @Param image_name formData string true "Имя изображения"
 // @Param product_id formData string true "id товара"
-// @Success 201 {object} dto.UploadMessage
+// @Success 201 {object} dto.ProductImage
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 403 {object} dto.ErrorMessage
 // @Failure 500 {object} dto.ErrorMessage
@@ -131,6 +132,47 @@ func BindPicture(c *gin.Context) {
 		Id:        pic_uuid,
 		ProductId: product_id,
 		ImagePath: "/images/" + core_name,
+	}
+	c.JSON(201, res)
+}
+
+// @Tags Админ
+// @Summary Открепить картинку
+// @Description Удаляет картинку из БД. Не трогает её в статике. Нужно для замены картинки товара и полного управления ими
+// @ID unbind_picture
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id query string true "id изображения"
+// @Success 201 {object} dto.Message
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/image-unbind [delete]
+func UnbindPicture(c *gin.Context) {
+	r, err := pkgauth.GetCurrentRights(c)
+	if r != "a" && r != "r" {
+		service.ErrorResponse(c, 403, "Недостаточно прав")
+		return
+	}
+
+	pic_id := c.Query("id")
+	pic_uuid, err := uuid.Parse(pic_id)
+	if err != nil {
+		service.ErrorResponse(c, 400, "Плохой запрос")
+		return
+	}
+
+	err = repository.DeletePicture(c, pic_uuid)
+	if err != nil {
+		service.ErrorResponse(c, 404, "Картинки нет в БД")
+		return
+	}
+
+	res := dto.Message{
+		Code:    200,
+		Message: "Картинка удалена из БД",
 	}
 	c.JSON(201, res)
 }
