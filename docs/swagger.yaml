@@ -116,6 +116,13 @@ definitions:
       message:
         type: string
     type: object
+  dto.NewPost:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    type: object
   dto.Product:
     properties:
       category_id:
@@ -212,6 +219,11 @@ definitions:
       name:
         type: string
       password:
+        type: string
+    type: object
+  dto.SlugReturn:
+    properties:
+      slug:
         type: string
     type: object
   dto.Specification:
@@ -749,6 +761,43 @@ paths:
       summary: Регистрация
       tags:
       - Аутентификация
+  /blog/posts:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новый пост в БД. Доступно только админам.
+      operationId: new_post
+      parameters:
+      - description: Данные поста
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.NewPost'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SlugReturn'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Создать новый пост
+      tags:
+      - Блог
   /categories:
     get:
       consumes:

@@ -7,7 +7,7 @@ import (
 )
 
 type Users struct {
-	Id        uuid.UUID `bun:"id"`
+	Id        uuid.UUID `bun:"id,pk"`
 	Name      string    `bun:"name"`
 	Email     string    `bun:"email"`
 	Password  string    `bun:"password"`

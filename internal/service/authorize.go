@@ -6,6 +6,7 @@ import (
 	"deller/internal/schema"
 	"errors"
 	"net/mail"
+	"unicode/utf8"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -44,9 +45,9 @@ func ValidateRegBody(body dto.RegisterBody) error {
 	var ret_err string
 	var err error
 
-	if len(body.Password) < 6 {
+	if utf8.RuneCountInString(body.Password) < 6 {
 		ret_err = "Пароль должен быть минимум 6 символов"
-	} else if len(body.Password) > 200 {
+	} else if utf8.RuneCountInString(body.Password) > 200 {
 		ret_err = "Пароль слишком длинный"
 	}
 
@@ -54,13 +55,13 @@ func ValidateRegBody(body dto.RegisterBody) error {
 	if merr != nil {
 		ret_err = "Электронная почта введена неверно"
 	}
-	if len(body.Email) > 200 {
+	if utf8.RuneCountInString(body.Email) > 200 {
 		ret_err = "Почта слишком длинная"
 	}
 
-	if len(body.Name) < 4 {
+	if utf8.RuneCountInString(body.Name) < 4 {
 		ret_err = "Имя пользователя слишком короткое"
-	} else if len(body.Name) > 100 {
+	} else if utf8.RuneCountInString(body.Name) > 100 {
 		ret_err = "Имя пользователя слишком длинное"
 	}
 
