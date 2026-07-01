@@ -25,6 +25,7 @@ type AddProductBody struct {
 	Tags          []string       `json:"tags"`
 	MainImage     string         `json:"main_image" example:"/images/example.png"`
 	Specification AdditionalSpec `json:"specification"`
+	IsTrending    bool           `json:"is_trending"`
 }
 type AdditionalSpec struct {
 	Gear               string `json:"gear"`
@@ -53,6 +54,7 @@ type PutProductBody struct {
 	Tags          []string       `json:"tags"`
 	MainImage     string         `json:"main_image" example:"/images/example.png"`
 	Specification AdditionalSpec `json:"specification"`
+	IsTrending    bool           `json:"is_trending"`
 }
 type PutCategoryBody struct {
 	Id        string `json:"id"`

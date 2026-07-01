@@ -54,6 +54,7 @@ func ConvertProducts(p []schema.Products) dto.ProductsResponse {
 			Discount:          e.Discount,
 			PriceWithDiscount: pwd,
 			MainImage:         e.MainImage,
+			IsTrending:        e.IsTrending,
 		}
 		prod = append(prod, uct)
 		total++

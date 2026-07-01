@@ -28,6 +28,7 @@ type Products struct {
 	UpdatedAt   time.Time `bun:"updated_at,nullzero"`
 	DeletedAt   time.Time `bun:"deleted_at,nullzero"`
 	MainImage   string    `bun:"main_image"`
+	IsTrending  bool      `bun:"is_trending"`
 
 	Specification *MotoSpecifications `bun:"rel:belongs-to,join:spec=id"`
 }

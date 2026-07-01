@@ -23,6 +23,7 @@ type Product struct {
 	Discount          int       `json:"discount"`
 	PriceWithDiscount int       `json:"price_with_discount"`
 	MainImage         string    `json:"main_image"`
+	IsTrending        bool      `json:"is_trending"`
 }
 
 type ProductDetail struct {

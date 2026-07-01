@@ -37,6 +37,7 @@ func SelectProductsByCategory(c *gin.Context, cat_id string) (error, int, []sche
 		Model(&products).
 		Where("category_id = ?", cat_id).
 		Where("deleted_at IS NULL").
+		OrderBy("is_trending", bun.OrderDesc).
 		ScanAndCount(ctx)
 	return err, count, products
 }
@@ -64,29 +65,52 @@ func GetProductsByTag(c *gin.Context, prod_id string) (error, int, []schema.Prod
 
 	tags := product.Tags
 	count, err = db.NewSelect().Model(&related_products).Where("products.tags && ?", pgdialect.Array(tags)).
-		OrderExpr("RANDOM()").Limit(4).Where("products.id != ?", prod_id).Where("deleted_at IS NULL").ScanAndCount(ctx)
-	if count < 4 {
-		var added_products []schema.Products
-		needed := 4 - count
+		Limit(4).Where("products.id != ?", prod_id).Where("deleted_at IS NULL").ScanAndCount(ctx)
 
+	if count < 4 {
 		excludedIDs := []string{prod_id}
 		for _, p := range related_products {
 			excludedIDs = append(excludedIDs, p.Id)
 		}
 
-		err = db.NewSelect().
-			Model(&added_products).
-			Where("products.id NOT IN ? AND deleted_at IS NULL", bun.Tuple(excludedIDs)).
-			OrderExpr("RANDOM()").
-			Limit(needed).
-			Scan(ctx)
-		if err != nil {
-			return err, count, related_products
+		neededFromCategory := 4 - len(related_products)
+		if neededFromCategory > 0 && product.CategoryId != "" {
+			var category_products []schema.Products
+			err = db.NewSelect().
+				Model(&category_products).
+				Where("products.category_id = ?", product.CategoryId).
+				Where("products.id NOT IN ? AND deleted_at IS NULL", bun.Tuple(excludedIDs)).
+				OrderExpr("RANDOM()").
+				Limit(neededFromCategory).
+				Scan(ctx)
+
+			if err == nil && len(category_products) > 0 {
+				related_products = append(related_products, category_products...)
+				for _, p := range category_products {
+					excludedIDs = append(excludedIDs, p.Id)
+				}
+			}
 		}
 
-		related_products = append(related_products, added_products...)
+		neededRandom := 4 - len(related_products)
+		if neededRandom > 0 {
+			var added_products []schema.Products
+			err = db.NewSelect().
+				Model(&added_products).
+				Where("products.id NOT IN ? AND deleted_at IS NULL", bun.Tuple(excludedIDs)).
+				OrderExpr("RANDOM()").
+				Limit(neededRandom).
+				Scan(ctx)
+
+			if err != nil {
+				return err, len(related_products), related_products
+			}
+			related_products = append(related_products, added_products...)
+		}
+
 		count = len(related_products)
 	}
+
 	return err, count, related_products
 }
 
@@ -172,6 +196,7 @@ func AddProduct(c *gin.Context, body dto.AddProductBody) (schema.Products, error
 		Tags:        body.Tags,
 		CreatedAt:   time.Now(),
 		MainImage:   body.MainImage,
+		IsTrending:  body.IsTrending,
 	}
 	ctx := c.Request.Context()
 
@@ -258,6 +283,7 @@ func PutProduct(c *gin.Context, body dto.PutProductBody, id string) error {
 		CreatedAt:   prod.CreatedAt,
 		UpdatedAt:   time.Now(),
 		MainImage:   body.MainImage,
+		IsTrending:  body.IsTrending,
 	}
 
 	tx, err := db.BeginTx(ctx, nil)

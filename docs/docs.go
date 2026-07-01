@@ -284,7 +284,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Удаляет картинку из БД. Не трогает её в статике.",
+                "description": "Удаляет картинку из БД. Не трогает её в статике. Нужно для замены картинки товара и полного управления ими",
                 "consumes": [
                     "application/json"
                 ],
@@ -913,6 +913,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "is_trending": {
+                    "type": "boolean"
+                },
                 "main_image": {
                     "type": "string",
                     "example": "/images/example.png"
@@ -1070,6 +1073,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "is_trending": {
+                    "type": "boolean"
                 },
                 "main_image": {
                     "type": "string"
