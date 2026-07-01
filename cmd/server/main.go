@@ -21,7 +21,7 @@ import (
 // @description Введите JWT токен
 
 // @title Deller-Ev API
-// @version 0.4
+// @version 0.5
 // @description Документация к API.
 // @BasePath /
 func main() {
@@ -42,6 +42,7 @@ func main() {
 		api.GET("/products/:id/relative", handlers.GetProductsByTag)
 
 		api.POST("/auth/login", handlers.LogIn)
+		api.POST("/auth/reg", handlers.Register)
 
 		auth := api.Group("")
 		auth.Use(pkgauth.JWTAuthMiddleware())

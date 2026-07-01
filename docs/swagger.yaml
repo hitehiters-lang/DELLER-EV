@@ -205,6 +205,15 @@ definitions:
       name:
         type: string
     type: object
+  dto.RegisterBody:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
   dto.Specification:
     properties:
       battery:
@@ -266,7 +275,7 @@ info:
   contact: {}
   description: Документация к API.
   title: Deller-Ev API
-  version: "0.4"
+  version: "0.5"
 paths:
   /admin/categories:
     post:
@@ -702,6 +711,42 @@ paths:
       security:
       - BearerAuth: []
       summary: Мой профиль
+      tags:
+      - Аутентификация
+  /auth/reg:
+    post:
+      consumes:
+      - application/json
+      description: 'Регистрация пользователя в БД. Недопустимы одинаковые почты или
+        имена. Возвращает JWT. (todo: add email confirmation)'
+      operationId: reg
+      parameters:
+      - description: Данные для регистрации
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.JWTResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Регистрация
       tags:
       - Аутентификация
   /categories:

@@ -688,6 +688,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/reg": {
+            "post": {
+                "description": "Регистрация пользователя в БД. Недопустимы одинаковые почты или имена. Возвращает JWT. (todo: add email confirmation)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Аутентификация"
+                ],
+                "summary": "Регистрация",
+                "operationId": "reg",
+                "parameters": [
+                    {
+                        "description": "Данные для регистрации",
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RegisterBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.JWTResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/categories": {
             "get": {
                 "description": "Возвращает id и имена категорий",
@@ -1198,6 +1251,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.RegisterBody": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.Specification": {
             "type": "object",
             "properties": {
@@ -1298,7 +1365,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.4",
+	Version:          "0.5",
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
