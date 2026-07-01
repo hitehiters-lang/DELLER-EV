@@ -123,6 +123,49 @@ definitions:
       title:
         type: string
     type: object
+  dto.Post:
+    properties:
+      author_is_admin:
+        type: boolean
+      author_name:
+        type: string
+      created_at:
+        type: string
+      is_approved:
+        type: boolean
+      slug:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.PostDetail:
+    properties:
+      author_is_admin:
+        type: boolean
+      author_name:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      is_approved:
+        type: boolean
+      slug:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.PostResponse:
+    properties:
+      posts:
+        items:
+          $ref: '#/definitions/dto.Post'
+        type: array
+      total:
+        type: integer
+    type: object
   dto.Product:
     properties:
       category_id:
@@ -735,15 +778,15 @@ paths:
       parameters:
       - description: Данные для регистрации
         in: body
-        name: login
+        name: reg
         required: true
         schema:
           $ref: '#/definitions/dto.RegisterBody'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/dto.JWTResponse'
         "400":
@@ -762,6 +805,43 @@ paths:
       tags:
       - Аутентификация
   /blog/posts:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает самые новые посты с пагинацией, а также сколько всего
+        постов есть в БД на данный момент.
+      operationId: get_posts
+      parameters:
+      - description: Смещение (def - 0)
+        in: query
+        name: "off"
+        type: integer
+      - description: Лимит (def - 15)
+        in: query
+        name: lim
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Получить посты
+      tags:
+      - Блог
     post:
       consumes:
       - application/json
@@ -777,8 +857,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/dto.SlugReturn'
         "400":
@@ -796,6 +876,40 @@ paths:
       security:
       - BearerAuth: []
       summary: Создать новый пост
+      tags:
+      - Блог
+  /blog/posts/{slug}:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает полный пост.
+      operationId: get_post_detail
+      parameters:
+      - description: Слаг поста
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PostDetail'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Получить пост по слагу
       tags:
       - Блог
   /categories:

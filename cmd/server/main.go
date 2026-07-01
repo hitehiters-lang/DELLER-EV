@@ -44,6 +44,9 @@ func main() {
 		api.POST("/auth/login", handlers.LogIn)
 		api.POST("/auth/reg", handlers.Register)
 
+		api.GET("/blog/posts", handlers.GetPosts)
+		api.GET("/blog/posts/:slug", handlers.GetPostDetail)
+
 		auth := api.Group("")
 		auth.Use(pkgauth.JWTAuthMiddleware())
 		{

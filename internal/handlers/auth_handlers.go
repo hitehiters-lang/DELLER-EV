@@ -90,8 +90,8 @@ func Me(c *gin.Context) {
 // @ID reg
 // @Accept json
 // @Produce json
-// @Param login body dto.RegisterBody true "Данные для регистрации"
-// @Success 200 {object} dto.JWTResponse
+// @Param reg body dto.RegisterBody true "Данные для регистрации"
+// @Success 201 {object} dto.JWTResponse
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 409 {object} dto.ErrorMessage
 // @Failure 500 {object} dto.ErrorMessage
