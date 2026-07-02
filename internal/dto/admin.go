@@ -61,3 +61,11 @@ type PutCategoryBody struct {
 	Name      string `json:"name"`
 	ImageName string `json:"image_name"`
 }
+type NewPost struct {
+	Title     string `json:"title"`
+	Content   string `json:"content"`
+	ImageName string `json:"image_name"`
+}
+type NewComment struct {
+	Content string `json:"content"`
+}

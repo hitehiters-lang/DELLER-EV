@@ -207,6 +207,68 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/comments/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Удаляет комментарий по id. Доступно только админам",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Комментарии"
+                ],
+                "summary": "Удалить комментарий",
+                "operationId": "del_comment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id комментария",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Message"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/image-bind": {
             "post": {
                 "security": [
@@ -389,6 +451,68 @@ const docTemplate = `{
                     },
                     "403": {
                         "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/posts/{slug}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Удаляет пост по слагу. Доступно только админам",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Блог"
+                ],
+                "summary": "Удалить пост",
+                "operationId": "del_post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Слаг поста",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Message"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorMessage"
                         }
@@ -797,7 +921,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Добавляеет комментарий к посту в БД. parent_id это к какому комментарию был ответ. Возвращает созданный комментарий в массиве",
+                "description": "Добавляет комментарий к посту в БД. parent_id это к какому комментарию был ответ. Возвращает созданный комментарий в массиве",
                 "consumes": [
                     "application/json"
                 ],
@@ -810,6 +934,12 @@ const docTemplate = `{
                 "summary": "Написать комментарий к посту",
                 "operationId": "add_comment",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid комментария для ответа (пусто - комментарий к посту)",
+                        "name": "parent_id",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "Слаг поста",
@@ -916,7 +1046,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Создаёт новый пост в БД. Доступно только админам.",
+                "description": "Создаёт новый пост в БД. Доступно только админам. Картинки добавляются через роут /admin/images. Название картинки пишется без расширения.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1377,6 +1507,9 @@ const docTemplate = `{
                 },
                 "parent_id": {
                     "type": "string"
+                },
+                "post_slug": {
+                    "type": "string"
                 }
             }
         },
@@ -1440,9 +1573,6 @@ const docTemplate = `{
             "properties": {
                 "content": {
                     "type": "string"
-                },
-                "parent_id": {
-                    "type": "string"
                 }
             }
         },
@@ -1450,6 +1580,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "content": {
+                    "type": "string"
+                },
+                "image_name": {
                     "type": "string"
                 },
                 "title": {
@@ -1467,6 +1600,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "created_at": {
+                    "type": "string"
+                },
+                "image_path": {
                     "type": "string"
                 },
                 "is_approved": {
@@ -1493,6 +1629,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "created_at": {
+                    "type": "string"
+                },
+                "image_path": {
                     "type": "string"
                 },
                 "is_approved": {

@@ -108,6 +108,8 @@ definitions:
         type: string
       parent_id:
         type: string
+      post_slug:
+        type: string
     type: object
   dto.CommentResponse:
     properties:
@@ -148,12 +150,12 @@ definitions:
     properties:
       content:
         type: string
-      parent_id:
-        type: string
     type: object
   dto.NewPost:
     properties:
       content:
+        type: string
+      image_name:
         type: string
       title:
         type: string
@@ -165,6 +167,8 @@ definitions:
       author_name:
         type: string
       created_at:
+        type: string
+      image_path:
         type: string
       is_approved:
         type: boolean
@@ -182,6 +186,8 @@ definitions:
       content:
         type: string
       created_at:
+        type: string
+      image_path:
         type: string
       is_approved:
         type: boolean
@@ -490,6 +496,46 @@ paths:
       summary: Изменить категорию
       tags:
       - Админ
+  /admin/comments/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет комментарий по id. Доступно только админам
+      operationId: del_comment
+      parameters:
+      - description: id комментария
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Удалить комментарий
+      tags:
+      - Комментарии
   /admin/image-bind:
     post:
       consumes:
@@ -619,6 +665,46 @@ paths:
       summary: Сохранить главную картинку
       tags:
       - Админ
+  /admin/posts/{slug}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет пост по слагу. Доступно только админам
+      operationId: del_post
+      parameters:
+      - description: Слаг поста
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Удалить пост
+      tags:
+      - Блог
   /admin/products:
     post:
       consumes:
@@ -877,10 +963,14 @@ paths:
     post:
       consumes:
       - application/json
-      description: Добавляеет комментарий к посту в БД. parent_id это к какому комментарию
+      description: Добавляет комментарий к посту в БД. parent_id это к какому комментарию
         был ответ. Возвращает созданный комментарий в массиве
       operationId: add_comment
       parameters:
+      - description: uuid комментария для ответа (пусто - комментарий к посту)
+        in: query
+        name: parent_id
+        type: string
       - description: Слаг поста
         in: path
         name: slug
@@ -957,7 +1047,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Создаёт новый пост в БД. Доступно только админам.
+      description: Создаёт новый пост в БД. Доступно только админам. Картинки добавляются
+        через роут /admin/images. Название картинки пишется без расширения.
       operationId: new_post
       parameters:
       - description: Данные поста

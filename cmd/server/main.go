@@ -67,6 +67,9 @@ func main() {
 			auth.POST("/admin/products", handlers.AddProduct)
 			auth.DELETE("/admin/products/:id", handlers.DelProduct)
 			auth.PUT("/admin/products/:id", handlers.PutProduct)
+
+			auth.DELETE("/admin/comments/:id", handlers.DelPostComment)
+			auth.DELETE("/admin/posts/:slug", handlers.DelPost)
 		}
 	}
 

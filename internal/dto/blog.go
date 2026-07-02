@@ -13,6 +13,7 @@ type Post struct {
 	AuthorIsAdmin bool      `json:"author_is_admin"`
 	IsApproved    bool      `json:"is_approved"`
 	CreatedAt     time.Time `json:"created_at"`
+	ImagePath     string    `json:"image_path"`
 }
 
 type PostDetail struct {
@@ -24,11 +25,7 @@ type PostDetail struct {
 	IsApproved    bool      `json:"is_approved"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
-}
-
-type NewPost struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	ImagePath     string    `json:"image_path"`
 }
 
 type SlugReturn struct {
@@ -47,6 +44,7 @@ type Comment struct {
 	AuthorIsAdmin      bool      `json:"author_is_admin"`
 	AuthorIsPostAuthor bool      `json:"author_is_post_author"`
 	ParentId           uuid.UUID `json:"parent_id"`
+	PostSlug           string    `json:"post_slug"`
 	CreatedAt          time.Time `json:"created_at"`
 	DeletedAt          time.Time `json:"deleted_at"`
 }
@@ -54,9 +52,4 @@ type Comment struct {
 type CommentResponse struct {
 	Comments []Comment `json:"comments"`
 	Total    int       `json:"total"`
-}
-
-type NewComment struct {
-	Content  string    `json:"content"`
-	ParentId uuid.UUID `json:"parent_id"`
 }

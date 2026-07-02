@@ -19,13 +19,13 @@ func ValidatePostBody(body dto.NewPost) error {
 
 	if utf8.RuneCountInString(body.Content) < 4 {
 		ret_err = "Содержание поста слишком короткое"
-	} else if utf8.RuneCountInString(body.Content) > 5000 {
+	} else if utf8.RuneCountInString(body.Content) > 50000 {
 		ret_err = "Содержание поста слишком длинное"
 	}
 
 	if utf8.RuneCountInString(body.Title) < 10 {
 		ret_err = "Название слишком короткое"
-	} else if utf8.RuneCountInString(body.Title) > 500 {
+	} else if utf8.RuneCountInString(body.Title) > 480 {
 		ret_err = "Название слишком длинное"
 	}
 
@@ -84,6 +84,7 @@ func ConvertPosts(c int, s []schema.Posts) dto.PostResponse {
 			AuthorIsAdmin: e.Author.IsAdmin,
 			IsApproved:    e.IsApproved,
 			CreatedAt:     e.CreatedAt,
+			ImagePath:     e.ImagePath,
 		}
 		po = append(po, sts)
 	}
@@ -103,6 +104,7 @@ func PostDetails(p schema.Posts) dto.PostDetail {
 		IsApproved:    p.IsApproved,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.CreatedAt,
+		ImagePath:     p.ImagePath,
 	}
 	return dto_post
 }
@@ -116,6 +118,7 @@ func ConvertComments(c []schema.Comments, t int) dto.CommentResponse {
 			AuthorName:         e.Author.Name,
 			AuthorIsAdmin:      e.Author.IsAdmin,
 			AuthorIsPostAuthor: false,
+			PostSlug:           e.Post.Slug,
 			CreatedAt:          time.Now(),
 		}
 		if e.Parent != nil {

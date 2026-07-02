@@ -159,7 +159,10 @@ func CheckProduct(c *gin.Context, prod_id string) error {
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
-	err := db.NewSelect().Model(&products).Where("id = ?", prod_id).Where("deleted_at IS NULL").Scan(ctx)
+	ct, err := db.NewSelect().Model(&products).Where("id = ?", prod_id).Where("deleted_at IS NULL").ScanAndCount(ctx)
+	if ct == 0 {
+		err = sql.ErrNoRows
+	}
 	return err
 }
 

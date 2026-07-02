@@ -6,13 +6,14 @@ import (
 	pkgauth "deller/internal/pkg/auth"
 	"deller/internal/repository"
 	"deller/internal/service"
+	"errors"
 
 	"github.com/gin-gonic/gin"
 )
 
 // @Tags Блог
 // @Summary Создать новый пост
-// @Description Создаёт новый пост в БД. Доступно только админам.
+// @Description Создаёт новый пост в БД. Доступно только админам. Картинки добавляются через роут /admin/images. Название картинки пишется без расширения.
 // @ID new_post
 // @Security BearerAuth
 // @Accept json
@@ -105,15 +106,65 @@ func GetPostDetail(c *gin.Context) {
 	}
 
 	post, err := repository.GetPostDetail(c, slug)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil {
+		if err == sql.ErrNoRows {
+			service.ErrorResponse(c, 404, "Ни одного поста не найдено")
+			return
+		}
 		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
-		return
-	} else if err == sql.ErrNoRows {
-		service.ErrorResponse(c, 404, "Ни одного поста не найдено")
 		return
 	}
 
 	res := service.PostDetails(post)
 
 	c.JSON(200, res)
+}
+
+// @Tags Блог
+// @Summary Удалить пост
+// @Description Удаляет пост по слагу. Доступно только админам
+// @ID del_post
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param slug path string true "Слаг поста"
+// @Success 201 {object} dto.Message
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/posts/{slug} [delete]
+func DelPost(c *gin.Context) {
+
+	r, err := pkgauth.GetCurrentRights(c)
+	if r != "a" && r != "r" {
+		service.ErrorResponse(c, 403, "Недостаточно прав")
+		return
+	}
+
+	slug := c.Param("slug")
+	if slug == "" {
+		service.ErrorResponse(c, 400, "Пост не указан")
+		return
+	}
+
+	_, err = repository.GetPostDetail(c, slug)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			service.ErrorResponse(c, 404, "Поста не существует")
+			return
+		}
+		service.ErrorResponse(c, 500, "Ошибка проверки поста: "+err.Error())
+		return
+	}
+
+	err = repository.DeletePost(c, slug)
+	if err != nil {
+		service.ErrorResponse(c, 500, "Ошибка удаления: "+err.Error())
+		return
+	}
+	c.JSON(200, dto.Message{
+		Code:    200,
+		Message: "Пост успешно удалён",
+	})
 }
