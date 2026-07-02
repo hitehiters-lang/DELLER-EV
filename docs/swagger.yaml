@@ -144,6 +144,13 @@ definitions:
       message:
         type: string
     type: object
+  dto.NewComment:
+    properties:
+      content:
+        type: string
+      parent_id:
+        type: string
+    type: object
   dto.NewPost:
     properties:
       content:
@@ -865,6 +872,48 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorMessage'
       summary: Получить комментарии поста
+      tags:
+      - Комментарии
+    post:
+      consumes:
+      - application/json
+      description: Добавляеет комментарий к посту в БД. parent_id это к какому комментарию
+        был ответ. Возвращает созданный комментарий в массиве
+      operationId: add_comment
+      parameters:
+      - description: Слаг поста
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Данные комментария
+        in: body
+        name: com
+        required: true
+        schema:
+          $ref: '#/definitions/dto.NewComment'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CommentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Написать комментарий к посту
       tags:
       - Комментарии
   /blog/posts:

@@ -46,7 +46,6 @@ func main() {
 
 		api.GET("/blog/posts", handlers.GetPosts)
 		api.GET("/blog/posts/:slug", handlers.GetPostDetail)
-
 		api.GET("/blog/comments/:slug", handlers.GetPostComments)
 
 		auth := api.Group("")
@@ -55,6 +54,7 @@ func main() {
 			auth.GET("/auth/me", handlers.Me)
 
 			auth.POST("/blog/posts", handlers.NewPost)
+			auth.POST("/blog/comments/:slug", handlers.AddPostComment)
 
 			auth.POST("/admin/images", handlers.AddPicture)
 			auth.POST("/admin/image-bind", handlers.BindPicture)

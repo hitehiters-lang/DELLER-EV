@@ -131,3 +131,18 @@ func ConvertComments(c []schema.Comments, t int) dto.CommentResponse {
 		Total:    t,
 	}
 }
+
+func ValidateComBody(body dto.NewComment) error {
+	var ret_err string
+	var err error
+
+	if utf8.RuneCountInString(body.Content) > 999 {
+		ret_err = "Содержание комментария слишком длинное"
+	}
+
+	if ret_err != "" {
+		err = errors.New(ret_err)
+	}
+
+	return err
+}

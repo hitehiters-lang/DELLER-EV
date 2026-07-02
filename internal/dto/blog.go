@@ -55,3 +55,8 @@ type CommentResponse struct {
 	Comments []Comment `json:"comments"`
 	Total    int       `json:"total"`
 }
+
+type NewComment struct {
+	Content  string    `json:"content"`
+	ParentId uuid.UUID `json:"parent_id"`
+}

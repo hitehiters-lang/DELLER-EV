@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
 
@@ -85,4 +86,37 @@ func GetComments(c *gin.Context, slug string) (error, int, []schema.Comments) {
 		Scan(ctx)
 
 	return err, count, comments
+}
+
+func CheckComParent(c *gin.Context, id uuid.UUID) error {
+	var comments []schema.Comments
+	ctx := c.Request.Context()
+	db := database.GetDatabase()
+
+	err := db.NewSelect().Model(&comments).Where("id = ?", id).Scan(ctx)
+	return err
+}
+
+func AddComment(c *gin.Context, b dto.NewComment, slug string) (schema.Comments, error) {
+
+	author, _ := pkgauth.GetCurrentUser(c)
+	com_uuid, _ := uuid.NewV7()
+
+	add_comm := schema.Comments{
+		Id:        com_uuid,
+		AuthorId:  author.Id,
+		PostSlug:  slug,
+		Content:   b.Content,
+		ParentId:  b.ParentId,
+		CreatedAt: time.Now(),
+	}
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	err := db.NewInsert().Model(&add_comm).Scan(ctx)
+	if err != nil {
+		return schema.Comments{}, err
+	}
+	err = db.NewSelect().Model(&add_comm).Where("comments.id = ?", com_uuid).Relation("Author").Relation("Parent").Relation("Post").Scan(ctx)
+	return add_comm, err
 }
