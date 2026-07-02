@@ -47,6 +47,8 @@ func main() {
 		api.GET("/blog/posts", handlers.GetPosts)
 		api.GET("/blog/posts/:slug", handlers.GetPostDetail)
 
+		api.GET("/blog/comments/:slug", handlers.GetPostComments)
+
 		auth := api.Group("")
 		auth.Use(pkgauth.JWTAuthMiddleware())
 		{

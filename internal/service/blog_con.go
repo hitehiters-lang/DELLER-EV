@@ -6,6 +6,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
@@ -104,4 +105,29 @@ func PostDetails(p schema.Posts) dto.PostDetail {
 		UpdatedAt:     p.CreatedAt,
 	}
 	return dto_post
+}
+
+func ConvertComments(c []schema.Comments, t int) dto.CommentResponse {
+	var com []dto.Comment
+	for _, e := range c {
+		ment := dto.Comment{
+			Id:                 e.Id,
+			Content:            e.Content,
+			AuthorName:         e.Author.Name,
+			AuthorIsAdmin:      e.Author.IsAdmin,
+			AuthorIsPostAuthor: false,
+			CreatedAt:          time.Now(),
+		}
+		if e.Parent != nil {
+			ment.ParentId = e.ParentId
+		}
+		if e.Post.AuthorID == e.AuthorId {
+			ment.AuthorIsPostAuthor = true
+		}
+		com = append(com, ment)
+	}
+	return dto.CommentResponse{
+		Comments: com,
+		Total:    t,
+	}
 }

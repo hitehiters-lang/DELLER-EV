@@ -1,6 +1,10 @@
 package dto
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Post struct {
 	Slug          string    `json:"slug"`
@@ -34,4 +38,20 @@ type SlugReturn struct {
 type PostResponse struct {
 	Posts []Post `json:"posts"`
 	Total int    `json:"total"`
+}
+
+type Comment struct {
+	Id                 uuid.UUID `json:"id"`
+	Content            string    `json:"content"`
+	AuthorName         string    `json:"author_name"`
+	AuthorIsAdmin      bool      `json:"author_is_admin"`
+	AuthorIsPostAuthor bool      `json:"author_is_post_author"`
+	ParentId           uuid.UUID `json:"parent_id"`
+	CreatedAt          time.Time `json:"created_at"`
+	DeletedAt          time.Time `json:"deleted_at"`
+}
+
+type CommentResponse struct {
+	Comments []Comment `json:"comments"`
+	Total    int       `json:"total"`
 }

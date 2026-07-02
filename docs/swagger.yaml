@@ -90,6 +90,34 @@ definitions:
       total_in_category:
         type: integer
     type: object
+  dto.Comment:
+    properties:
+      author_is_admin:
+        type: boolean
+      author_is_post_author:
+        type: boolean
+      author_name:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: string
+      parent_id:
+        type: string
+    type: object
+  dto.CommentResponse:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/dto.Comment'
+        type: array
+      total:
+        type: integer
+    type: object
   dto.ErrorMessage:
     properties:
       code:
@@ -804,6 +832,41 @@ paths:
       summary: Регистрация
       tags:
       - Аутентификация
+  /blog/comments/{slug}:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает все комментарии поста. parent_id это к какому комментарию
+        был ответ.
+      operationId: get_comments
+      parameters:
+      - description: Слаг поста
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CommentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Получить комментарии поста
+      tags:
+      - Комментарии
   /blog/posts:
     get:
       consumes:

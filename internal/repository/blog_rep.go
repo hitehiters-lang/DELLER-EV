@@ -64,3 +64,25 @@ func GetPostDetail(c *gin.Context, slug string) (schema.Posts, error) {
 
 	return post, err
 }
+
+func GetComments(c *gin.Context, slug string) (error, int, []schema.Comments) {
+	var comments []schema.Comments
+	ctx := c.Request.Context()
+	db := database.GetDatabase()
+
+	count, err := db.NewSelect().Model((*schema.Comments)(nil)).Count(ctx)
+	if err != nil || count == 0 {
+		return err, count, comments
+	}
+
+	err = db.NewSelect().
+		Model(&comments).
+		Where("comments.deleted_at IS NULL").
+		Relation("Author").
+		Relation("Parent").
+		Relation("Post").
+		OrderBy("comments.created_at", bun.OrderAsc).
+		Scan(ctx)
+
+	return err, count, comments
+}

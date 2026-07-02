@@ -741,6 +741,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/blog/comments/{slug}": {
+            "get": {
+                "description": "Возвращает все комментарии поста. parent_id это к какому комментарию был ответ.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Комментарии"
+                ],
+                "summary": "Получить комментарии поста",
+                "operationId": "get_comments",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Слаг поста",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CommentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/blog/posts": {
             "get": {
                 "description": "Возвращает самые новые посты с пагинацией, а также сколько всего постов есть в БД на данный момент.",
@@ -1233,6 +1284,49 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "total_in_category": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.Comment": {
+            "type": "object",
+            "properties": {
+                "author_is_admin": {
+                    "type": "boolean"
+                },
+                "author_is_post_author": {
+                    "type": "boolean"
+                },
+                "author_name": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CommentResponse": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.Comment"
+                    }
+                },
+                "total": {
                     "type": "integer"
                 }
             }

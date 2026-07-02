@@ -18,3 +18,17 @@ type Posts struct {
 
 	Author *Users `bun:"rel:belongs-to,join:author_id=id"`
 }
+
+type Comments struct {
+	Id        uuid.UUID `bun:"id,pk"`
+	AuthorId  uuid.UUID `bun:"author_id"`
+	PostSlug  string    `bun:"post_slug"`
+	Content   string    `bun:"content"`
+	ParentId  uuid.UUID `bun:"parent_id,nullzero"`
+	CreatedAt time.Time `bun:"created_at"`
+	DeletedAt time.Time `bun:"deleted_at,nullzero"`
+
+	Author *Users    `bun:"rel:belongs-to,join:author_id=id"`
+	Post   *Posts    `bun:"rel:belongs-to,join:post_slug=slug"`
+	Parent *Comments `bun:"rel:belongs-to,join:parent_id=id"`
+}
