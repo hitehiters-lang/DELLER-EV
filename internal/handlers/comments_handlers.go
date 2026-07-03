@@ -71,10 +71,6 @@ func AddPostComment(c *gin.Context) {
 	}
 
 	parent_uuid := c.Query("parent_id")
-	if slug == "" {
-		service.ErrorResponse(c, 400, "Плохой запрос")
-		return
-	}
 	parent, err := uuid.Parse(parent_uuid)
 	is_answer := false
 	if err == nil {

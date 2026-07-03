@@ -79,3 +79,25 @@ type ProductImage struct {
 	ProductId string    `json:"product_id"`
 	ImagePath string    `json:"image_path"`
 }
+
+type Review struct {
+	Id            uuid.UUID `json:"id"`
+	AuthorName    string    `json:"author_name"`
+	AuthorIsAdmin bool      `json:"author_is_admin"`
+	ProductId     string    `json:"product_id"`
+	Rate          int       `json:"rate"`
+	Content       string    `json:"content"`
+	ParentId      uuid.UUID `json:"parent_id"`
+	CreatedAt     time.Time `json:"created_at"`
+}
+
+type ReviewResponse struct {
+	Reviews []Review `json:"reviews"`
+	Total   int      `json:"total"`
+	Rate    float64  `json:"rate"`
+}
+
+type NewReview struct {
+	Rate    int    `json:"rate"`
+	Content string `json:"content"`
+}

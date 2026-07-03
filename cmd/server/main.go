@@ -21,7 +21,7 @@ import (
 // @description Введите JWT токен
 
 // @title Deller-Ev API
-// @version 0.5
+// @version 0.6
 // @description Документация к API.
 // @BasePath /
 func main() {
@@ -48,6 +48,8 @@ func main() {
 		api.GET("/blog/posts/:slug", handlers.GetPostDetail)
 		api.GET("/blog/comments/:slug", handlers.GetPostComments)
 
+		api.GET("/products/:id/reviews", handlers.GetProductReviews)
+
 		auth := api.Group("")
 		auth.Use(pkgauth.JWTAuthMiddleware())
 		{
@@ -70,6 +72,9 @@ func main() {
 
 			auth.DELETE("/admin/comments/:id", handlers.DelPostComment)
 			auth.DELETE("/admin/posts/:slug", handlers.DelPost)
+			auth.DELETE("/admin/reviews/:id", handlers.DelProductReview)
+
+			auth.POST("/products/:id/reviews", handlers.AddProductReview)
 		}
 	}
 

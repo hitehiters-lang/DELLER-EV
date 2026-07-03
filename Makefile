@@ -15,6 +15,7 @@ copy-images:
 	xcopy /E /I /Y /Q $(IMAGES_DIR) $(BUILD_DIR)\$(IMAGES_DIR)
 
 build: copy-images
+	swag init -g cmd/server/main.go --parseInternal
 	cd cmd/server && go build -o ../../$(BUILD_DIR)/$(APP_NAME).exe .
 	cd cmd/server && set GOOS=linux&& set GOARCH=amd64&& go build -o ../../$(BUILD_DIR)/$(APP_NAME) .
 

@@ -160,6 +160,13 @@ definitions:
       title:
         type: string
     type: object
+  dto.NewReview:
+    properties:
+      content:
+        type: string
+      rate:
+        type: integer
+    type: object
   dto.Post:
     properties:
       author_is_admin:
@@ -305,6 +312,36 @@ definitions:
       password:
         type: string
     type: object
+  dto.Review:
+    properties:
+      author_is_admin:
+        type: boolean
+      author_name:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      parent_id:
+        type: string
+      product_id:
+        type: string
+      rate:
+        type: integer
+    type: object
+  dto.ReviewResponse:
+    properties:
+      rate:
+        type: number
+      reviews:
+        items:
+          $ref: '#/definitions/dto.Review'
+        type: array
+      total:
+        type: integer
+    type: object
   dto.SlugReturn:
     properties:
       slug:
@@ -371,7 +408,7 @@ info:
   contact: {}
   description: Документация к API.
   title: Deller-Ev API
-  version: "0.5"
+  version: "0.6"
 paths:
   /admin/categories:
     post:
@@ -828,6 +865,46 @@ paths:
       summary: Изменить товар
       tags:
       - Админ
+  /admin/reviews/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет отзыв по id. Доступно только админам.
+      operationId: del_review
+      parameters:
+      - description: id отзыва
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Удалить отзыв
+      tags:
+      - Отзывы
   /auth/login:
     post:
       consumes:
@@ -1246,6 +1323,89 @@ paths:
       summary: Получить похожие товары по тегу
       tags:
       - Товары
+  /products/{id}/reviews:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает все отзывы о товаре. parent_id это к какому отзыву был
+        ответ. У ответов на отзывы не должна отображаться оценка
+      operationId: get_reviews
+      parameters:
+      - description: id товара
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ReviewResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Получить отзывы о товаре
+      tags:
+      - Отзывы
+    post:
+      consumes:
+      - application/json
+      description: Добавляет отзыв к товару в БД. parent_id это к какому отзыву был
+        ответ. Возвращает созданный отзыв в массиве.
+      operationId: add_review
+      parameters:
+      - description: uuid отзыва для ответа (пусто - комментарий к посту). Ответы
+          на отзывы доступны только админам. При ответе на отзыв, оценка игнорируется,
+          её на фронт не пихаем (ставь 1 балл у ответов всегда)
+        in: query
+        name: parent_id
+        type: string
+      - description: id товара
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Данные отзыва
+        in: body
+        name: rev
+        required: true
+        schema:
+          $ref: '#/definitions/dto.NewReview'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ReviewResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Написать отзыв к товару
+      tags:
+      - Отзывы
 securityDefinitions:
   BearerAuth:
     description: Введите JWT токен

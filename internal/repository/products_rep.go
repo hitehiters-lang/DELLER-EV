@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"deller/internal/database"
 	"deller/internal/dto"
+	pkgauth "deller/internal/pkg/auth"
 	"deller/internal/schema"
 	"errors"
 	"time"
@@ -356,4 +357,91 @@ func DeletePicture(c *gin.Context, pic_uuid uuid.UUID) error {
 		return sql.ErrNoRows
 	}
 	return nil
+}
+
+func CheckReview(c *gin.Context, id uuid.UUID) error {
+	var reviews []schema.Reviews
+	ctx := c.Request.Context()
+	db := database.GetDatabase()
+
+	ct, err := db.NewSelect().Model(&reviews).Where("reviews.id = ? AND reviews.deleted_at IS NULL", id).ScanAndCount(ctx)
+	if ct == 0 {
+		err = sql.ErrNoRows
+	}
+	return err
+}
+
+func AddReview(c *gin.Context, b dto.NewReview, id string, p uuid.UUID) (schema.Reviews, error) {
+
+	author, _ := pkgauth.GetCurrentUser(c)
+	rev_uuid, _ := uuid.NewV7()
+
+	add_rev := schema.Reviews{
+		Id:        rev_uuid,
+		AuthorId:  author.Id,
+		ProductId: id,
+		Rate:      b.Rate,
+		Content:   b.Content,
+		ParentId:  p,
+		CreatedAt: time.Now(),
+	}
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	err := db.NewInsert().Model(&add_rev).Scan(ctx)
+	if err != nil {
+		return schema.Reviews{}, err
+	}
+	err = db.NewSelect().Model(&add_rev).Where("reviews.id = ?", rev_uuid).Relation("Author").Relation("Parent").Relation("Product").Scan(ctx)
+	return add_rev, err
+}
+
+func GetReviews(c *gin.Context, id string) (error, int, []schema.Reviews) {
+	var reviews []schema.Reviews
+	ctx := c.Request.Context()
+	db := database.GetDatabase()
+
+	count, err := db.NewSelect().Model((*schema.Reviews)(nil)).Where("reviews.product_id = ?", id).
+		Where("reviews.deleted_at IS NULL").Count(ctx)
+	if err != nil || count == 0 {
+		return err, count, reviews
+	}
+
+	err = db.NewSelect().
+		Model(&reviews).
+		Where("reviews.product_id = ?", id).
+		Where("reviews.deleted_at IS NULL").
+		Relation("Author").
+		Relation("Parent").
+		Relation("Product").
+		OrderBy("reviews.created_at", bun.OrderAsc).
+		Scan(ctx)
+
+	return err, count, reviews
+}
+
+func DeleteReview(c *gin.Context, id uuid.UUID) error {
+	del_rev := schema.Reviews{
+		DeletedAt: time.Now(),
+	}
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	_, err := db.NewUpdate().Model(&del_rev).Where("id = ?", id).Column("deleted_at").Exec(ctx)
+	return err
+}
+
+func CheckForRevRepeat(c *gin.Context, id string) (bool, error) {
+	var review schema.Reviews
+	ctx := c.Request.Context()
+	db := database.GetDatabase()
+	cur_user, _ := pkgauth.GetCurrentUser(c)
+
+	bl, err := db.NewSelect().
+		Model(&review).
+		Where("reviews.product_id = ?", id).
+		Where("reviews.author_id = ?", cur_user.Id).
+		Where("reviews.deleted_at IS NULL").
+		Exists(ctx)
+	return bl, err
 }

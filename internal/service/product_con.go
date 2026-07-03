@@ -7,7 +7,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
+	"unicode/utf8"
+
+	"github.com/google/uuid"
 )
 
 func ConvertCategories(p []schema.Categories) dto.CategoriesResponse {
@@ -189,4 +194,60 @@ func GenerateUniqueFileName(name string) (string, error) {
 	}
 
 	return "", errors.New("could not generate unique file name: too many attempts")
+}
+
+func ValidateRevBody(body dto.NewReview) error {
+	var ret_err string
+	var err error
+
+	if body.Rate < 1 || body.Rate > 5 {
+		ret_err = "Оценка невалидна"
+	}
+
+	if utf8.RuneCountInString(body.Content) > 990 {
+		ret_err = "Слишком длинное содержание отзыва"
+	}
+
+	if ret_err != "" {
+		err = errors.New(ret_err)
+	}
+
+	return err
+}
+
+func ConvertReviews(r []schema.Reviews) dto.ReviewResponse {
+	var rev []dto.Review
+	var total_rate int
+	var total int = 0
+	for _, e := range r {
+		iews := dto.Review{
+			Id:            e.Id,
+			AuthorName:    e.Author.Name,
+			AuthorIsAdmin: e.Author.IsAdmin,
+			ProductId:     e.ProductId,
+			ParentId:      e.ParentId,
+			Rate:          e.Rate,
+			Content:       e.Content,
+			CreatedAt:     time.Now(),
+		}
+		rev = append(rev, iews)
+		if iews.ParentId == uuid.Nil {
+			total++
+			total_rate += e.Rate
+		}
+	}
+	var str_rate string
+	var rate float64
+	if total > 0 {
+		str_rate = fmt.Sprintf("%.1f", float64(total_rate)/float64(total))
+		rate, _ = strconv.ParseFloat(str_rate, 64)
+	} else {
+		rate = 0.0
+	}
+
+	return dto.ReviewResponse{
+		Reviews: rev,
+		Total:   total,
+		Rate:    rate,
+	}
 }

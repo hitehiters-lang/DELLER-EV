@@ -38,3 +38,18 @@ type ProductImages struct {
 	ProductId string    `bun:"product_id"`
 	ImagePath string    `bun:"image_path"`
 }
+
+type Reviews struct {
+	Id        uuid.UUID `bun:"id,pk"`
+	AuthorId  uuid.UUID `bun:"author_id"`
+	ProductId string    `bun:"product_id"`
+	Rate      int       `bun:"rate"`
+	Content   string    `bun:"content"`
+	ParentId  uuid.UUID `bun:"parent_id,nullzero"`
+	CreatedAt time.Time `bun:"created_at"`
+	DeletedAt time.Time `bun:"deleted_at,nullzero"`
+
+	Author  *Users    `bun:"rel:belongs-to,join:author_id=id"`
+	Product *Products `bun:"rel:belongs-to,join:product_id=id"`
+	Parent  *Comments `bun:"rel:belongs-to,join:parent_id=id"`
+}
