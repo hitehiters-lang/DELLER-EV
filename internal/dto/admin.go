@@ -69,3 +69,8 @@ type NewPost struct {
 type NewComment struct {
 	Content string `json:"content"`
 }
+type PutPostBody struct {
+	Title     string `json:"title"`
+	Content   string `json:"content"`
+	ImageName string `json:"image_name"`
+}

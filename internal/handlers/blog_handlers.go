@@ -168,3 +168,59 @@ func DelPost(c *gin.Context) {
 		Message: "Пост успешно удалён",
 	})
 }
+
+// @Tags Блог
+// @Summary Изменить пост
+// @Description Изменяет пост по слагу. Доступно только админам. КОДЕКСУ: Дополнительно добавь чтобы можно было вставлять изображения для блогов, как ты это сделал в товарах.
+// @ID put_post
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param slug path string true "Слаг поста"
+// @Param putter body dto.PutPostBody true "Тело запроса"
+// @Success 201 {object} dto.Message
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/posts/{slug} [put]
+func PutPost(c *gin.Context) {
+
+	r, err := pkgauth.GetCurrentRights(c)
+	if r != "a" && r != "r" {
+		service.ErrorResponse(c, 403, "Недостаточно прав")
+		return
+	}
+
+	var body dto.PutPostBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		service.ErrorResponse(c, 400, "Плохой запрос")
+		return
+	}
+
+	slug := c.Param("slug")
+	if slug == "" {
+		service.ErrorResponse(c, 400, "Пост не указан")
+		return
+	}
+
+	_, err = repository.GetPostDetail(c, slug)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			service.ErrorResponse(c, 404, "Поста не существует")
+			return
+		}
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
+
+	err = repository.PutPost(c, body, slug)
+	if err != nil {
+		service.ErrorResponse(c, 400, "Ошибка: "+err.Error())
+		return
+	}
+	c.JSON(200, dto.Message{
+		Code:    200,
+		Message: "Пост " + slug + " успешно изменён",
+	})
+}

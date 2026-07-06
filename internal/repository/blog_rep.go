@@ -154,3 +154,20 @@ func DeleteComment(c *gin.Context, id uuid.UUID) error {
 	_, err := db.NewUpdate().Model(&del_comm).Where("id = ?", id).Column("deleted_at").Exec(ctx)
 	return err
 }
+
+func PutPost(c *gin.Context, body dto.PutPostBody, slug string) error {
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	upd_post := schema.Posts{
+		Title:     body.Title,
+		Content:   body.Content,
+		ImagePath: "/images/" + body.ImageName + ".png",
+		UpdatedAt: time.Now(),
+	}
+	_, err := db.NewUpdate().Model(&upd_post).Where("slug = ?", slug).OmitZero().Exec(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}

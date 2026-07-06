@@ -303,6 +303,15 @@ definitions:
       name:
         type: string
     type: object
+  dto.PutPostBody:
+    properties:
+      content:
+        type: string
+      image_name:
+        type: string
+      title:
+        type: string
+    type: object
   dto.RegisterBody:
     properties:
       email:
@@ -740,6 +749,53 @@ paths:
       security:
       - BearerAuth: []
       summary: Удалить пост
+      tags:
+      - Блог
+    put:
+      consumes:
+      - application/json
+      description: 'Изменяет пост по слагу. Доступно только админам. КОДЕКСУ: Дополнительно
+        добавь чтобы можно было вставлять изображения для блогов, как ты это сделал
+        в товарах.'
+      operationId: put_post
+      parameters:
+      - description: Слаг поста
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Тело запроса
+        in: body
+        name: putter
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PutPostBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Изменить пост
       tags:
       - Блог
   /admin/products:
