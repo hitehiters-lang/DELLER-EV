@@ -28,6 +28,12 @@ func CacheCategory(cat schema.Categories) {
 	fmt.Println("[SERVER] - category \"" + cat.Id + "\" cached by creation")
 }
 
+func CacheManual(m schema.Manuals) {
+	pkgtrans.TranslateText("manual_name_"+m.Slug, m.Name, "zh")
+
+	fmt.Println("[SERVER] - manual \"" + m.Slug + "\" cached by creation")
+}
+
 func CacheProduct(p schema.Products) {
 	s := p.Specification
 	pkgtrans.TranslateText("spec_gear_"+s.Id.String(), s.Gear, "zh")
@@ -91,7 +97,7 @@ func CacheAllContent() {
 	}
 	fmt.Println("[SERVER] - PRODUCTS, SPECS AND CATEGORIES CACHED")
 
-	// caching posts
+	// caching posts and manuals
 	err, _, posts := repository.GetPosts(ctx, 200, 0)
 	if err != nil {
 		fmt.Println("[SERVER] - " + err.Error())
@@ -100,6 +106,15 @@ func CacheAllContent() {
 	for _, post := range posts {
 		CachePost(post)
 	}
-	fmt.Println("[SERVER] - BLOG CACHED")
+
+	err, _, manuals := repository.GetManuals(ctx)
+	if err != nil {
+		fmt.Println("[SERVER] - " + err.Error())
+		return
+	}
+	for _, manual := range manuals {
+		CacheManual(manual)
+	}
+	fmt.Println("[SERVER] - BLOG AND MANUALS CACHED")
 	fmt.Println("[SERVER] - CACHE ENDED SUCCESSFULLY")
 }

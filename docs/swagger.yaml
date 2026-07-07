@@ -9,6 +9,17 @@ definitions:
       name:
         type: string
     type: object
+  dto.AddManualBody:
+    properties:
+      file_name:
+        type: string
+      image_name:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+    type: object
   dto.AddProductBody:
     properties:
       category_id:
@@ -138,6 +149,30 @@ definitions:
         type: string
       password:
         type: string
+    type: object
+  dto.Manual:
+    properties:
+      created_at:
+        type: string
+      file_path:
+        type: string
+      id:
+        type: integer
+      image_path:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+    type: object
+  dto.ManualResponse:
+    properties:
+      manuals:
+        items:
+          $ref: '#/definitions/dto.Manual'
+        type: array
+      total:
+        type: integer
     type: object
   dto.Message:
     properties:
@@ -611,6 +646,47 @@ paths:
       summary: Удалить комментарий
       tags:
       - Комментарии
+  /admin/files:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Сохраняет файл в статику. Должно использоваться совместно с другими
+        ручками, например добавления руководства.
+      operationId: add_file
+      parameters:
+      - description: PDF файл
+        in: formData
+        name: file
+        type: file
+      - description: Имя файла (без .pdf)
+        in: formData
+        name: file_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.UploadMessage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Сохранить файл
+      tags:
+      - Админ
   /admin/image-bind:
     post:
       consumes:
@@ -740,6 +816,91 @@ paths:
       summary: Сохранить главную картинку
       tags:
       - Админ
+  /admin/manuals:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новое руководство в БД. Возвращает массив только с созданным
+        руководством. Достуно только админу. Картинка прикрепляется через ручку главных
+        картинок, как к товарам. Файл прикрепляется ручкой в админке.
+      operationId: add_manual
+      parameters:
+      - description: Данные руководства
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddManualBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ManualResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Создать новое руководство
+      tags:
+      - Руководства
+  /admin/manuals/{slug}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет руководство из БД. Достуно только админу.
+      operationId: del_manual
+      parameters:
+      - description: slug руководства
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/dto.Manual'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Удалить руководство
+      tags:
+      - Руководства
   /admin/posts/{slug}:
     delete:
       consumes:
@@ -1355,6 +1516,39 @@ paths:
       summary: Получить все товары определённой категории
       tags:
       - Товары
+  /manuals:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает все данные о руководствах
+      operationId: get_manuals
+      parameters:
+      - description: Языковой код (ru, en, kk, zh)
+        in: query
+        name: l
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ManualResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Получить все руководства
+      tags:
+      - Руководства
   /products/{id}:
     get:
       consumes:

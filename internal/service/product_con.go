@@ -135,8 +135,7 @@ func GetImages(i []schema.ProductImages) []dto.ProductImage {
 	return res
 }
 
-func GenerateUniqueFileName(name string) (string, error) {
-	sharedDir := "./shared"
+func GenerateUniqueFileName(name, sharedDir string) (string, error) {
 
 	cleanName := filepath.Clean(name)
 	if strings.Contains(cleanName, "..") {

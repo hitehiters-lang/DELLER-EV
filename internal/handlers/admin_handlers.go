@@ -18,6 +18,62 @@ import (
 var caching int32 = 0
 
 // @Tags Админ
+// @Summary Сохранить файл
+// @Description Сохраняет файл в статику. Должно использоваться совместно с другими ручками, например добавления руководства.
+// @ID add_file
+// @Security BearerAuth
+// @Accept multipart/form-data
+// @Produce json
+// @Param file formData file false "PDF файл"
+// @Param file_name formData string true "Имя файла (без .pdf)"
+// @Success 201 {object} dto.UploadMessage
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/files [post]
+func AddFile(c *gin.Context) {
+
+	r, _ := pkgauth.GetCurrentRights(c)
+	if r != "a" && r != "r" {
+		service.ErrorResponse(c, 403, "Недостаточно прав")
+		return
+	}
+
+	file_name := c.PostForm("file_name")
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		service.ErrorResponse(c, 400, "Нет файла")
+		return
+	}
+
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+	if ext != ".pdf" {
+		service.ErrorResponse(c, 400, "Неправильное расширение файла")
+		return
+	}
+
+	core_name, err := service.GenerateUniqueFileName(file_name+".pdf", "./shared/files")
+	if err != nil {
+		service.ErrorResponse(c, 400, "Плохое название файла: "+err.Error())
+		return
+	}
+
+	dst := "./shared/files/" + core_name
+	if err := c.SaveUploadedFile(file, dst); err != nil {
+		service.ErrorResponse(c, 500, "Не удалось сохранить файл: "+err.Error())
+		return
+	}
+
+	res := dto.UploadMessage{
+		Code:    201,
+		Message: "Файл успешно сохранён",
+		Link:    "/files/" + core_name,
+	}
+	c.JSON(201, res)
+}
+
+// @Tags Админ
 // @Summary Сохранить главную картинку
 // @Description Сохраняет картинку в статику. Должно использоваться совместно с другими ручками, например добавления товара или категории.
 // @ID add_picture
@@ -53,13 +109,13 @@ func AddPicture(c *gin.Context) {
 		return
 	}
 
-	core_name, err := service.GenerateUniqueFileName(image_name + ".png")
+	core_name, err := service.GenerateUniqueFileName(image_name+".png", "./shared/images")
 	if err != nil {
 		service.ErrorResponse(c, 400, "Плохое название файла: "+err.Error())
 		return
 	}
 
-	dst := "./shared/" + core_name
+	dst := "./shared/images/" + core_name
 	if err := c.SaveUploadedFile(file, dst); err != nil {
 		service.ErrorResponse(c, 500, "Не удалось сохранить файл: "+err.Error())
 		return
@@ -109,7 +165,7 @@ func BindPicture(c *gin.Context) {
 		return
 	}
 
-	core_name, err := service.GenerateUniqueFileName(image_name + ".png")
+	core_name, err := service.GenerateUniqueFileName(image_name+".png", "./shared/images")
 	if err != nil {
 		service.ErrorResponse(c, 400, "Плохое название файла: "+err.Error())
 		return

@@ -28,6 +28,7 @@ import (
 func main() {
 	config.LoadENV()
 	database.InitDatabase()
+
 	err := pkgtrans.TranslatorCheck()
 	if err != nil {
 		return
@@ -38,7 +39,10 @@ func main() {
 
 	api := r.Group("/api/v1")
 	{
-		api.Static("/images", "./shared")
+		api.Static("/images", "./shared/images")
+		api.Static("/files", "./shared/files")
+
+		api.GET("/manuals", handlers.GetManuals)
 
 		api.GET("/categories", handlers.GetCategories)
 		api.GET("/categories/:id", handlers.GetProducts)
@@ -63,6 +67,8 @@ func main() {
 			auth.POST("/blog/posts", handlers.NewPost)
 			auth.POST("/blog/comments/:slug", handlers.AddPostComment)
 
+			auth.POST("/admin/files", handlers.AddFile)
+
 			auth.POST("/admin/images", handlers.AddPicture)
 			auth.POST("/admin/image-bind", handlers.BindPicture)
 			auth.DELETE("/admin/image-unbind", handlers.UnbindPicture)
@@ -81,6 +87,9 @@ func main() {
 			auth.DELETE("/admin/reviews/:id", handlers.DelProductReview)
 
 			auth.POST("/products/:id/reviews", handlers.AddProductReview)
+
+			auth.POST("/admin/manuals", handlers.AddManual)
+			auth.DELETE("/admin/manuals/:slug", handlers.DelManual)
 
 			auth.POST("/admin/cache", handlers.CacheAll)
 		}
