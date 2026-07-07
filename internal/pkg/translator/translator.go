@@ -50,18 +50,21 @@ func TranslateText(slug, text, code string) string {
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			if code == "zh" {
+				var ttext string
 				err = db.NewSelect().Model(&cached).Where("slug = ?", slug).Where("loc_to = ?", "en").Scan(ctx)
 				if err != nil {
-					translation(slug, text, "en", "ru")
+					ttext = translation(slug, text, "en", "ru")
 				}
-				if cached.TransText == "" {
-					cached.TransText = text
+				if ttext == "" {
+					ttext = text
 				}
-				return translation(slug, cached.TransText, code, "en")
+				return translation(slug, ttext, code, "en")
 			}
 		}
+		fmt.Println("[SERVER] - cache error: " + err.Error())
 		return text
 	}
+	fmt.Println("[SERVER] - already have \"" + cached.Slug + "\" cached in db. using now")
 	return cached.TransText
 }
 
@@ -114,6 +117,8 @@ func translation(slug, text, code, from string) string {
 	_, err = db.NewInsert().Model(&cached).Exec(ctx)
 	if err != nil {
 		fmt.Println("[SERVER] - ", err)
+	} else {
+		fmt.Println("[SERVER] - cached \"" + cached.Slug + "\" from " + from + " to " + code)
 	}
 	return result.TranslatedText
 }

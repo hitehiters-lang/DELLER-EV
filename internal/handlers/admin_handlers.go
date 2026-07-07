@@ -214,6 +214,7 @@ func AddCategory(c *gin.Context) {
 			}
 			res := service.ConvertCategory(new_category)
 			c.JSON(201, res)
+			go service.CacheCategory(new_category)
 			return
 		}
 		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
@@ -311,6 +312,7 @@ func AddProduct(c *gin.Context) {
 
 			res := service.ConvertProductDetail(prod, img_arr, "ru")
 			c.JSON(201, res)
+			go service.CacheProduct(prod)
 			return
 		}
 		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
@@ -411,11 +413,12 @@ func PutProduct(c *gin.Context) {
 		return
 	}
 
-	err = repository.PutProduct(c, body, product)
+	new_product, err := repository.PutProduct(c, body, product)
 	if err != nil {
 		service.ErrorResponse(c, 400, "Ошибка: "+err.Error())
 		return
 	}
+	go service.CacheProduct(new_product)
 	c.JSON(200, dto.Message{
 		Code:    200,
 		Message: "Товар " + product + " успешно изменён",
@@ -466,11 +469,12 @@ func PutCategory(c *gin.Context) {
 		return
 	}
 
-	err = repository.PutCategory(c, body, category)
+	cats, err := repository.PutCategory(c, body, category)
 	if err != nil {
 		service.ErrorResponse(c, 400, "Ошибка: "+err.Error())
 		return
 	}
+	go service.CacheCategory(cats)
 	c.JSON(200, dto.Message{
 		Code:    200,
 		Message: "Категория " + category + " успешно изменена",

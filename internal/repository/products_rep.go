@@ -241,7 +241,7 @@ func DeleteProduct(c *gin.Context, prod string) error {
 	return err
 }
 
-func PutProduct(c *gin.Context, body dto.PutProductBody, id string) error {
+func PutProduct(c *gin.Context, body dto.PutProductBody, id string) (schema.Products, error) {
 	s := body.Specification
 	ctx := c.Request.Context()
 
@@ -249,11 +249,11 @@ func PutProduct(c *gin.Context, body dto.PutProductBody, id string) error {
 	var prod schema.Products
 	err := db.NewSelect().Model(&prod).Relation("Specification").Where("products.id = ?", id).Scan(ctx)
 	if err != nil {
-		return err
+		return schema.Products{}, err
 	}
 
 	if prod.Spec == uuid.Nil {
-		return errors.New("product has no specification")
+		return schema.Products{}, errors.New("product has no specification")
 	}
 
 	new_specs := schema.MotoSpecifications{
@@ -292,25 +292,29 @@ func PutProduct(c *gin.Context, body dto.PutProductBody, id string) error {
 
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
-		return err
+		return schema.Products{}, err
 	}
 	defer tx.Rollback()
 	_, err = tx.NewUpdate().Model(&new_specs).Where("id = ?", prod.Spec).Exec(ctx)
 	if err != nil {
-		return err
+		return schema.Products{}, err
 	}
 	_, err = tx.NewUpdate().Model(&new_product).WherePK().ExcludeColumn("spec").Exec(ctx)
 	if err != nil {
-		return err
+		return schema.Products{}, err
+	}
+	err = tx.NewSelect().Model(&new_product).WherePK().Relation("Specification").Scan(ctx)
+	if err != nil {
+		return schema.Products{}, err
 	}
 	err = tx.Commit()
 	if err != nil {
-		return err
+		return schema.Products{}, err
 	}
-	return nil
+	return new_product, nil
 }
 
-func PutCategory(c *gin.Context, body dto.PutCategoryBody, id string) error {
+func PutCategory(c *gin.Context, body dto.PutCategoryBody, id string) (schema.Categories, error) {
 	ctx := c.Request.Context()
 
 	db := database.GetDatabase()
@@ -319,11 +323,11 @@ func PutCategory(c *gin.Context, body dto.PutCategoryBody, id string) error {
 		Name:      body.Name,
 		ImagePath: "/images/" + body.Name + ".png",
 	}
-	_, err := db.NewUpdate().Model(&upd_cat).Where("id = ?", id).Exec(ctx)
+	err := db.NewUpdate().Model(&upd_cat).Where("id = ?", id).Returning("*").Scan(ctx)
 	if err != nil {
-		return err
+		return schema.Categories{}, err
 	}
-	return nil
+	return upd_cat, nil
 }
 
 func BindPicture(c *gin.Context, image_name, product_id string) (uuid.UUID, error) {

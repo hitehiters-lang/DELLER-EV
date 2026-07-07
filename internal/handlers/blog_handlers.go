@@ -47,7 +47,7 @@ func NewPost(c *gin.Context) {
 
 	new_slug := service.CreateSlugFromTitle(body.Title)
 	add_post, err := repository.AddPost(c, body, new_slug)
-
+	go service.CachePost(add_post)
 	c.JSON(201, dto.SlugReturn{Slug: add_post.Slug})
 }
 
