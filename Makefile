@@ -9,6 +9,7 @@ help:
 	@echo "  build           - build app into $(BUILD_DIR)/"
 	@echo "  run             - run the app (requires PostgreSQL)"
 	@echo "  copy-images     - copy images folder to $(BUILD_DIR)/"
+	@echo "  runt   		 - run translator"
 
 copy-images:
 	@echo Copying images to $(BUILD_DIR)...
@@ -22,3 +23,6 @@ build: copy-images
 run:
 	swag init -g cmd/server/main.go --parseInternal
 	go run cmd/server/main.go
+
+runt:
+	cd build/libretranslate && activate

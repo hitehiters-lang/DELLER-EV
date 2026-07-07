@@ -6,6 +6,7 @@ import (
 	"deller/internal/database"
 	"deller/internal/handlers"
 	pkgauth "deller/internal/pkg/auth"
+	pkgtrans "deller/internal/pkg/translator"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -21,12 +22,16 @@ import (
 // @description Введите JWT токен
 
 // @title Deller-Ev API
-// @version 0.6
+// @version 1.0
 // @description Документация к API.
 // @BasePath /
 func main() {
 	config.LoadENV()
 	database.InitDatabase()
+	err := pkgtrans.TranslatorCheck()
+	if err != nil {
+		return
+	}
 
 	r := gin.Default()
 	r.Use(cors.Default())

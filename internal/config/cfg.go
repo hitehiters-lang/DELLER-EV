@@ -14,6 +14,7 @@ type Config struct {
 	DatabaseName string
 	ServerPort   string
 	JwtSecret    string
+	LibreSecret  string
 }
 
 var cfg Config
@@ -28,6 +29,7 @@ func LoadENV() {
 	cfg.DatabaseName = os.Getenv("DB_NAME")
 	cfg.ServerPort = os.Getenv("SERVER_PORT")
 	cfg.JwtSecret = os.Getenv("JWT_SECRET")
+	cfg.LibreSecret = os.Getenv("LIBRE_SECRET")
 
 	if cfg.DatabaseHost == "" {
 		cfg.DatabaseHost = "localhost"
@@ -61,4 +63,8 @@ func GetServer() string {
 }
 func GetJwt() string {
 	return cfg.ServerPort
+}
+
+func GetLibre() string {
+	return cfg.LibreSecret
 }

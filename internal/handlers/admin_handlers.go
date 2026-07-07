@@ -309,7 +309,7 @@ func AddProduct(c *gin.Context) {
 			imgs := repository.GetProductPictures(c, new_product.Id)
 			img_arr := service.GetImages(imgs)
 
-			res := service.ConvertProductDetail(prod, img_arr)
+			res := service.ConvertProductDetail(prod, img_arr, "ru")
 			c.JSON(201, res)
 			return
 		}

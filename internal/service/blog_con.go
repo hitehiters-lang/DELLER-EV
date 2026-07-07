@@ -2,6 +2,7 @@ package service
 
 import (
 	"deller/internal/dto"
+	pkgtrans "deller/internal/pkg/translator"
 	"deller/internal/schema"
 	"errors"
 	"strconv"
@@ -74,12 +75,12 @@ func GetPostsQuery(c *gin.Context) (int, int, error) {
 	return lim, off, nil
 }
 
-func ConvertPosts(c int, s []schema.Posts) dto.PostResponse {
+func ConvertPosts(c int, s []schema.Posts, code string) dto.PostResponse {
 	var po []dto.Post
 	for _, e := range s {
 		sts := dto.Post{
 			Slug:          e.Slug,
-			Title:         e.Title,
+			Title:         pkgtrans.TranslateText("post_title_"+e.Slug, e.Title, code),
 			AuthorName:    e.Author.Name,
 			AuthorIsAdmin: e.Author.IsAdmin,
 			IsApproved:    e.IsApproved,
@@ -94,11 +95,11 @@ func ConvertPosts(c int, s []schema.Posts) dto.PostResponse {
 	}
 }
 
-func PostDetails(p schema.Posts) dto.PostDetail {
+func PostDetails(p schema.Posts, code string) dto.PostDetail {
 	dto_post := dto.PostDetail{
 		Slug:          p.Slug,
-		Title:         p.Title,
-		Content:       p.Content,
+		Title:         pkgtrans.TranslateText("post_title_"+p.Slug, p.Title, code),
+		Content:       pkgtrans.TranslateText("post_content_"+p.Slug, p.Content, code),
 		AuthorName:    p.Author.Name,
 		AuthorIsAdmin: p.Author.IsAdmin,
 		IsApproved:    p.IsApproved,

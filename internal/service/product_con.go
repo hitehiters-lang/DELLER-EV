@@ -2,6 +2,7 @@ package service
 
 import (
 	"deller/internal/dto"
+	pkgtrans "deller/internal/pkg/translator"
 	"deller/internal/schema"
 	"errors"
 	"fmt"
@@ -15,13 +16,13 @@ import (
 	"github.com/google/uuid"
 )
 
-func ConvertCategories(p []schema.Categories) dto.CategoriesResponse {
+func ConvertCategories(p []schema.Categories, code string) dto.CategoriesResponse {
 	var cate []dto.Category
 	var total int
 	for _, e := range p {
 		gories := dto.Category{
 			Id:              e.Id,
-			Name:            e.Name,
+			Name:            pkgtrans.TranslateText("category_name_"+e.Id, e.Name, code),
 			ImagePath:       e.ImagePath,
 			TotalInCategory: e.ProductsCount,
 		}
@@ -44,7 +45,7 @@ func ConvertCategory(p schema.Categories) dto.Category {
 	return cat
 }
 
-func ConvertProducts(p []schema.Products) dto.ProductsResponse {
+func ConvertProducts(p []schema.Products, code string) dto.ProductsResponse {
 	var prod []dto.Product
 	var total int
 	for _, e := range p {
@@ -53,8 +54,8 @@ func ConvertProducts(p []schema.Products) dto.ProductsResponse {
 			Id:                e.Id,
 			CategoryId:        e.CategoryId,
 			Spec:              e.Spec,
-			Name:              e.Name,
-			Short:             e.Short,
+			Name:              pkgtrans.TranslateText("product_name_"+e.Id, e.Name, code),
+			Short:             pkgtrans.TranslateText("product_short_"+e.Id, e.Short, code),
 			Price:             e.Price,
 			Discount:          e.Discount,
 			PriceWithDiscount: pwd,
@@ -70,37 +71,37 @@ func ConvertProducts(p []schema.Products) dto.ProductsResponse {
 	}
 }
 
-func ConvertProductDetail(p schema.Products, v []dto.ProductImage) dto.ProductDetail {
+func ConvertProductDetail(p schema.Products, v []dto.ProductImage, code string) dto.ProductDetail {
 	pwd := p.Price - int(float64(p.Price)*(float64(p.Discount)/100))
 	var spec dto.Specification
 	if p.Specification != nil {
 		s := p.Specification
 		spec = dto.Specification{
 			Id:                 s.Id,
-			Gear:               s.Gear,
-			PowerRatedMax:      s.PowerRatedMax,
-			TorqueMoment:       s.TorqueMoment,
-			MaxSpeed:           s.MaxSpeed,
-			Battery:            s.Battery,
-			PowerReserve:       s.PowerReserve,
-			Weight:             s.Weight,
-			LoadCap:            s.LoadCap,
-			DimensionsLWH:      s.DimensionsLWH,
-			SeatHeight:         s.SeatHeight,
-			Tires:              s.Tires,
-			Break:              s.Break,
-			Clearance:          s.Clearance,
-			Charging:           s.Charging,
-			MoistureProtection: s.MoistureProtection,
+			Gear:               pkgtrans.TranslateText("spec_gear_"+s.Id.String(), s.Gear, code),
+			PowerRatedMax:      pkgtrans.TranslateText("spec_pwm_"+s.Id.String(), s.PowerRatedMax, code),
+			TorqueMoment:       pkgtrans.TranslateText("spec_torq_"+s.Id.String(), s.TorqueMoment, code),
+			MaxSpeed:           pkgtrans.TranslateText("spec_mxspeed_"+s.Id.String(), s.MaxSpeed, code),
+			Battery:            pkgtrans.TranslateText("spec_acc_"+s.Id.String(), s.Battery, code),
+			PowerReserve:       pkgtrans.TranslateText("spec_powres_"+s.Id.String(), s.PowerReserve, code),
+			Weight:             pkgtrans.TranslateText("spec_weight_"+s.Id.String(), s.Weight, code),
+			LoadCap:            pkgtrans.TranslateText("spec_cap_"+s.Id.String(), s.LoadCap, code),
+			DimensionsLWH:      pkgtrans.TranslateText("spec_dim_"+s.Id.String(), s.DimensionsLWH, code),
+			SeatHeight:         pkgtrans.TranslateText("spec_seat_"+s.Id.String(), s.SeatHeight, code),
+			Tires:              pkgtrans.TranslateText("spec_tire_"+s.Id.String(), s.Tires, code),
+			Break:              pkgtrans.TranslateText("spec_br_"+s.Id.String(), s.Break, code),
+			Clearance:          pkgtrans.TranslateText("spec_clear_"+s.Id.String(), s.Clearance, code),
+			Charging:           pkgtrans.TranslateText("spec_charg_"+s.Id.String(), s.Charging, code),
+			MoistureProtection: pkgtrans.TranslateText("spec_mp_"+s.Id.String(), s.MoistureProtection, code),
 		}
 	}
 	product := dto.ProductDetail{
 		Id:                p.Id,
 		CategoryId:        p.CategoryId,
 		Spec:              p.Spec,
-		Name:              p.Name,
-		Short:             p.Short,
-		Description:       p.Description,
+		Name:              pkgtrans.TranslateText("product_name_"+p.Id, p.Name, code),
+		Short:             pkgtrans.TranslateText("product_short_"+p.Id, p.Short, code),
+		Description:       pkgtrans.TranslateText("product_desc_"+p.Id, p.Description, code),
 		Price:             p.Price,
 		Discount:          p.Discount,
 		Tags:              p.Tags,

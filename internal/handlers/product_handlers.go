@@ -14,12 +14,18 @@ import (
 // @ID get_categories
 // @Accept json
 // @Produce json
+// @Param l query string false "Языковой код (ru, en, kk, zh)"
 // @Success 200 {object} dto.CategoriesResponse
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 404 {object} dto.ErrorMessage
 // @Failure 500 {object} dto.ErrorMessage
 // @Router /categories [get]
 func GetCategories(c *gin.Context) {
+
+	l := service.LoadLocalisation(c)
+	if l == "" {
+		l = "ru"
+	}
 
 	err, count, cats := repository.GetCategories(c)
 	if err != nil && err != sql.ErrNoRows {
@@ -30,7 +36,7 @@ func GetCategories(c *gin.Context) {
 		return
 	}
 
-	res := service.ConvertCategories(cats)
+	res := service.ConvertCategories(cats, l)
 
 	c.JSON(200, res)
 }
@@ -40,6 +46,7 @@ func GetCategories(c *gin.Context) {
 // @ID get_products
 // @Accept json
 // @Produce json
+// @Param l query string false "Языковой код (ru, en, kk, zh)"
 // @Param id path string true "id категории"
 // @Success 200 {object} dto.ProductsResponse
 // @Failure 400 {object} dto.ErrorMessage
@@ -47,6 +54,11 @@ func GetCategories(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorMessage
 // @Router /categories/{id} [get]
 func GetProducts(c *gin.Context) {
+
+	l := service.LoadLocalisation(c)
+	if l == "" {
+		l = "ru"
+	}
 
 	category := c.Param("id")
 	if category == "" {
@@ -62,7 +74,7 @@ func GetProducts(c *gin.Context) {
 		service.ErrorResponse(c, 404, "Ни одного продукта по заданной категории не найдено")
 		return
 	}
-	res := service.ConvertProducts(sch)
+	res := service.ConvertProducts(sch, l)
 
 	c.JSON(200, res)
 }
@@ -73,6 +85,7 @@ func GetProducts(c *gin.Context) {
 // @ID get_product_by_id
 // @Accept json
 // @Produce json
+// @Param l query string false "Языковой код (ru, en, kk, zh)"
 // @Param id path string true "id товара"
 // @Success 200 {object} dto.ProductDetail
 // @Failure 400 {object} dto.ErrorMessage
@@ -80,6 +93,11 @@ func GetProducts(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorMessage
 // @Router /products/{id} [get]
 func GetProductByID(c *gin.Context) {
+
+	l := service.LoadLocalisation(c)
+	if l == "" {
+		l = "ru"
+	}
 
 	prod_id := c.Param("id")
 	if prod_id == "" {
@@ -95,10 +113,10 @@ func GetProductByID(c *gin.Context) {
 		service.ErrorResponse(c, 404, "Ни одного продукта по заданному id не найдено")
 		return
 	}
-	imgs := repository.GetProductPictures(c, prod_id)
 
+	imgs := repository.GetProductPictures(c, prod_id)
 	img_arr := service.GetImages(imgs)
-	res := service.ConvertProductDetail(prod, img_arr)
+	res := service.ConvertProductDetail(prod, img_arr, l)
 
 	c.JSON(200, res)
 }
@@ -109,6 +127,7 @@ func GetProductByID(c *gin.Context) {
 // @ID get_products_by_tag
 // @Accept json
 // @Produce json
+// @Param l query string false "Языковой код (ru, en, kk, zh)"
 // @Param id path string true "id товара"
 // @Success 200 {object} dto.ProductsResponse
 // @Failure 400 {object} dto.ErrorMessage
@@ -116,6 +135,11 @@ func GetProductByID(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorMessage
 // @Router /products/{id}/relative [get]
 func GetProductsByTag(c *gin.Context) {
+
+	l := service.LoadLocalisation(c)
+	if l == "" {
+		l = "ru"
+	}
 
 	prod_id := c.Param("id")
 	if prod_id == "" {
@@ -132,7 +156,7 @@ func GetProductsByTag(c *gin.Context) {
 		return
 	}
 
-	res := service.ConvertProducts(related)
+	res := service.ConvertProducts(related, l)
 
 	c.JSON(200, res)
 }

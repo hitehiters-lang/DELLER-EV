@@ -1132,6 +1132,12 @@ const docTemplate = `{
                 "operationId": "get_posts",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "description": "Смещение (def - 0)",
                         "name": "off",
@@ -1245,6 +1251,12 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "Слаг поста",
                         "name": "slug",
                         "in": "path",
@@ -1293,6 +1305,14 @@ const docTemplate = `{
                 ],
                 "summary": "Получить все категории",
                 "operationId": "get_categories",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1335,6 +1355,12 @@ const docTemplate = `{
                 "summary": "Получить все товары определённой категории",
                 "operationId": "get_products",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "id категории",
@@ -1388,6 +1414,12 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "id товара",
                         "name": "id",
                         "in": "path",
@@ -1437,6 +1469,12 @@ const docTemplate = `{
                 "summary": "Получить похожие товары по тегу",
                 "operationId": "get_products_by_tag",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "id товара",
@@ -2242,7 +2280,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.6",
+	Version:          "1.0",
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},

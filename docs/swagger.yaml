@@ -417,7 +417,7 @@ info:
   contact: {}
   description: Документация к API.
   title: Deller-Ev API
-  version: "0.6"
+  version: "1.0"
 paths:
   /admin/categories:
     post:
@@ -1147,6 +1147,10 @@ paths:
         постов есть в БД на данный момент.
       operationId: get_posts
       parameters:
+      - description: Языковой код (ru, en, kk, zh)
+        in: query
+        name: l
+        type: string
       - description: Смещение (def - 0)
         in: query
         name: "off"
@@ -1221,6 +1225,10 @@ paths:
       description: Возвращает полный пост.
       operationId: get_post_detail
       parameters:
+      - description: Языковой код (ru, en, kk, zh)
+        in: query
+        name: l
+        type: string
       - description: Слаг поста
         in: path
         name: slug
@@ -1254,6 +1262,11 @@ paths:
       - application/json
       description: Возвращает id и имена категорий
       operationId: get_categories
+      parameters:
+      - description: Языковой код (ru, en, kk, zh)
+        in: query
+        name: l
+        type: string
       produces:
       - application/json
       responses:
@@ -1282,6 +1295,10 @@ paths:
       - application/json
       operationId: get_products
       parameters:
+      - description: Языковой код (ru, en, kk, zh)
+        in: query
+        name: l
+        type: string
       - description: id категории
         in: path
         name: id
@@ -1317,6 +1334,10 @@ paths:
         есть)
       operationId: get_product_by_id
       parameters:
+      - description: Языковой код (ru, en, kk, zh)
+        in: query
+        name: l
+        type: string
       - description: id товара
         in: path
         name: id
@@ -1352,6 +1373,10 @@ paths:
         Если таких нет, или их не 4 - добивает рандомными до 4ёх.
       operationId: get_products_by_tag
       parameters:
+      - description: Языковой код (ru, en, kk, zh)
+        in: query
+        name: l
+        type: string
       - description: id товара
         in: path
         name: id

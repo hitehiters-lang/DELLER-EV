@@ -57,6 +57,7 @@ func NewPost(c *gin.Context) {
 // @ID get_posts
 // @Accept json
 // @Produce json
+// @Param l query string false "Языковой код (ru, en, kk, zh)"
 // @Param off query int false "Смещение (def - 0)"
 // @Param lim query int false "Лимит (def - 15)"
 // @Success 200 {object} dto.PostResponse
@@ -65,6 +66,11 @@ func NewPost(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorMessage
 // @Router /blog/posts [get]
 func GetPosts(c *gin.Context) {
+
+	l := service.LoadLocalisation(c)
+	if l == "" {
+		l = "ru"
+	}
 
 	lim, off, err := service.GetPostsQuery(c)
 	if err != nil {
@@ -80,7 +86,7 @@ func GetPosts(c *gin.Context) {
 		return
 	}
 
-	res := service.ConvertPosts(count, posts)
+	res := service.ConvertPosts(count, posts, l)
 
 	c.JSON(200, res)
 }
@@ -91,6 +97,7 @@ func GetPosts(c *gin.Context) {
 // @ID get_post_detail
 // @Accept json
 // @Produce json
+// @Param l query string false "Языковой код (ru, en, kk, zh)"
 // @Param slug path string true "Слаг поста"
 // @Success 200 {object} dto.PostDetail
 // @Failure 400 {object} dto.ErrorMessage
@@ -98,6 +105,11 @@ func GetPosts(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorMessage
 // @Router /blog/posts/{slug} [get]
 func GetPostDetail(c *gin.Context) {
+
+	l := service.LoadLocalisation(c)
+	if l == "" {
+		l = "ru"
+	}
 
 	slug := c.Param("slug")
 	if slug == "" {
@@ -115,7 +127,7 @@ func GetPostDetail(c *gin.Context) {
 		return
 	}
 
-	res := service.PostDetails(post)
+	res := service.PostDetails(post, l)
 
 	c.JSON(200, res)
 }

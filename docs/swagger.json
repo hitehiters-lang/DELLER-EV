@@ -4,7 +4,7 @@
         "description": "Документация к API.",
         "title": "Deller-Ev API",
         "contact": {},
-        "version": "0.6"
+        "version": "1.0"
     },
     "basePath": "/",
     "paths": {
@@ -1125,6 +1125,12 @@
                 "operationId": "get_posts",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "description": "Смещение (def - 0)",
                         "name": "off",
@@ -1238,6 +1244,12 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "Слаг поста",
                         "name": "slug",
                         "in": "path",
@@ -1286,6 +1298,14 @@
                 ],
                 "summary": "Получить все категории",
                 "operationId": "get_categories",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1328,6 +1348,12 @@
                 "summary": "Получить все товары определённой категории",
                 "operationId": "get_products",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "id категории",
@@ -1381,6 +1407,12 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "id товара",
                         "name": "id",
                         "in": "path",
@@ -1430,6 +1462,12 @@
                 "summary": "Получить похожие товары по тегу",
                 "operationId": "get_products_by_tag",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "id товара",
