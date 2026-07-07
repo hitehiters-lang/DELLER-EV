@@ -81,6 +81,8 @@ func main() {
 			auth.DELETE("/admin/reviews/:id", handlers.DelProductReview)
 
 			auth.POST("/products/:id/reviews", handlers.AddProductReview)
+
+			auth.POST("/admin/cache", handlers.CacheAll)
 		}
 	}
 

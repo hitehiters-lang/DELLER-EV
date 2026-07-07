@@ -1,9 +1,13 @@
 package service
 
 import (
+	"context"
 	pkgtrans "deller/internal/pkg/translator"
+	"deller/internal/repository"
 	"deller/internal/schema"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -53,4 +57,49 @@ func CachePost(p schema.Posts) {
 	pkgtrans.TranslateText("post_content_"+p.Slug, p.Content, "zh")
 
 	fmt.Println("[SERVER] - post \"" + p.Slug + "\" cached by creation")
+}
+
+func CacheAllContent() {
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	req, _ := http.NewRequestWithContext(context.Background(), "GET", "/", nil)
+	ctx.Request = req
+
+	// caching categories
+	err, _, categories := repository.GetCategories(ctx)
+	if err != nil {
+		fmt.Println("[SERVER] - " + err.Error())
+		return
+	}
+	for _, category := range categories {
+		CacheCategory(category)
+
+		// caching products and specs
+		err, _, products := repository.SelectProductsByCategory(ctx, category.Id)
+		if err != nil {
+			fmt.Println("[SERVER] - " + err.Error())
+			return
+		}
+		for _, product := range products {
+			err, _, full_product := repository.GetProductDetail(ctx, product.Id)
+			if err != nil {
+				fmt.Println("[SERVER] - " + err.Error())
+				return
+			}
+			CacheProduct(full_product)
+		}
+	}
+	fmt.Println("[SERVER] - PRODUCTS, SPECS AND CATEGORIES CACHED")
+
+	// caching posts
+	err, _, posts := repository.GetPosts(ctx, 200, 0)
+	if err != nil {
+		fmt.Println("[SERVER] - " + err.Error())
+		return
+	}
+	for _, post := range posts {
+		CachePost(post)
+	}
+	fmt.Println("[SERVER] - BLOG CACHED")
+	fmt.Println("[SERVER] - CACHE ENDED SUCCESSFULLY")
 }

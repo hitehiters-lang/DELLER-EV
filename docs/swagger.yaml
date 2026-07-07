@@ -419,6 +419,35 @@ info:
   title: Deller-Ev API
   version: "1.0"
 paths:
+  /admin/cache:
+    post:
+      consumes:
+      - application/json
+      description: Переводит все категории, посты, товары и их характеристики на языки
+        сайта..
+      operationId: cache_all
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"message":"Кеширование начато"}'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Кешировать переводы на всём сайте
+      tags:
+      - Админ
   /admin/categories:
     post:
       consumes:

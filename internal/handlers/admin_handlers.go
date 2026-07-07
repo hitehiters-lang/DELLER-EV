@@ -9,10 +9,13 @@ import (
 	"errors"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
+
+var caching int32 = 0
 
 // @Tags Админ
 // @Summary Сохранить главную картинку
@@ -479,4 +482,33 @@ func PutCategory(c *gin.Context) {
 		Code:    200,
 		Message: "Категория " + category + " успешно изменена",
 	})
+}
+
+// @Tags Админ
+// @Summary Кешировать переводы на всём сайте
+// @Description Переводит все категории, посты, товары и их характеристики на языки сайта..
+// @ID cache_all
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Success 200 "{"message":"Кеширование начато"}""
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/cache [post]
+func CacheAll(c *gin.Context) {
+	if atomic.CompareAndSwapInt32(&caching, 0, 1) {
+		c.JSON(200, map[string]string{"message": "Кеширование начато"})
+
+		go func() {
+			defer endCaching()
+			service.CacheAllContent()
+		}()
+		return
+	}
+	c.JSON(200, map[string]string{"message": "Кеширование в процессе"})
+}
+
+func endCaching() {
+	defer atomic.StoreInt32(&caching, 0)
 }
