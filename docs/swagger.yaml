@@ -133,6 +133,23 @@ definitions:
       total:
         type: integer
     type: object
+  dto.CreateOrder:
+    properties:
+      address:
+        type: string
+      comment:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      products:
+        items:
+          $ref: '#/definitions/dto.OrderProduct'
+        type: array
+    type: object
   dto.ErrorMessage:
     properties:
       code:
@@ -204,6 +221,45 @@ definitions:
       content:
         type: string
       rate:
+        type: integer
+    type: object
+  dto.Order:
+    properties:
+      address:
+        type: string
+      comment:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      products:
+        items:
+          $ref: '#/definitions/dto.OrderProduct'
+        type: array
+    type: object
+  dto.OrderProduct:
+    properties:
+      price:
+        type: integer
+      product_slug:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  dto.OrdersResponse:
+    properties:
+      orders:
+        items:
+          $ref: '#/definitions/dto.Order'
+        type: array
+      total:
         type: integer
     type: object
   dto.Post:
@@ -906,6 +962,78 @@ paths:
       summary: Удалить руководство
       tags:
       - Руководства
+  /admin/orders:
+    get:
+      consumes:
+      - application/json
+      description: Получить все заказы из бд. price - цена за 1 товар. Доступно только
+        админам.
+      operationId: get_orders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OrdersResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Получить все заказы
+      tags:
+      - Заказы
+  /admin/orders/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет заказ, подтверждая что он был отменён или доставлен. Доступно
+        только админам.
+      operationId: del_order
+      parameters:
+      - description: uuid заказа
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Удалить заказ
+      tags:
+      - Заказы
   /admin/posts/{slug}:
     delete:
       consumes:
@@ -1554,6 +1682,45 @@ paths:
       summary: Получить все руководства
       tags:
       - Руководства
+  /orders:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет заказ пользователя в бд и высылает ему письмо на почту.
+        Входить необязательно. price необязателен и в бд не записывается. quantity
+        это количество и оно обязательно
+      operationId: add_order
+      parameters:
+      - description: Данные заказа
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateOrder'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: '{"message": "Заказ принят, ждите звонка."}'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Создать заказ
+      tags:
+      - Заказы
   /products/{id}:
     get:
       consumes:

@@ -59,6 +59,8 @@ func main() {
 
 		api.GET("/products/:id/reviews", handlers.GetProductReviews)
 
+		api.POST("/orders", handlers.AddOrder)
+
 		auth := api.Group("")
 		auth.Use(pkgauth.JWTAuthMiddleware())
 		{
@@ -85,6 +87,9 @@ func main() {
 			auth.DELETE("/admin/posts/:slug", handlers.DelPost)
 			auth.PUT("/admin/posts/:slug", handlers.PutPost)
 			auth.DELETE("/admin/reviews/:id", handlers.DelProductReview)
+
+			auth.DELETE("/admin/orders/:id", handlers.DelOrder)
+			auth.GET("/admin/orders", handlers.GetOrders)
 
 			auth.POST("/products/:id/reviews", handlers.AddProductReview)
 
