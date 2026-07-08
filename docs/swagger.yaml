@@ -11,6 +11,8 @@ definitions:
     type: object
   dto.AddManualBody:
     properties:
+      company:
+        type: string
       file_name:
         type: string
       image_name:
@@ -152,6 +154,8 @@ definitions:
     type: object
   dto.Manual:
     properties:
+      company:
+        type: string
       created_at:
         type: string
       file_path:
@@ -654,11 +658,11 @@ paths:
         ручками, например добавления руководства.
       operationId: add_file
       parameters:
-      - description: PDF файл
+      - description: Файл
         in: formData
         name: file
         type: file
-      - description: Имя файла (без .pdf)
+      - description: Имя файла (без расширения)
         in: formData
         name: file_name
         required: true
@@ -822,7 +826,8 @@ paths:
       - application/json
       description: Создаёт новое руководство в БД. Возвращает массив только с созданным
         руководством. Достуно только админу. Картинка прикрепляется через ручку главных
-        картинок, как к товарам. Файл прикрепляется ручкой в админке.
+        картинок, как к товарам. Файл прикрепляется ручкой в админке. Файл пишется
+        здесь с расширением
       operationId: add_manual
       parameters:
       - description: Данные руководства

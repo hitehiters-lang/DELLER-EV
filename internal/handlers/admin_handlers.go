@@ -24,8 +24,8 @@ var caching int32 = 0
 // @Security BearerAuth
 // @Accept multipart/form-data
 // @Produce json
-// @Param file formData file false "PDF файл"
-// @Param file_name formData string true "Имя файла (без .pdf)"
+// @Param file formData file false "Файл"
+// @Param file_name formData string true "Имя файла (без расширения)"
 // @Success 201 {object} dto.UploadMessage
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 403 {object} dto.ErrorMessage
@@ -48,12 +48,12 @@ func AddFile(c *gin.Context) {
 	}
 
 	ext := strings.ToLower(filepath.Ext(file.Filename))
-	if ext != ".pdf" {
-		service.ErrorResponse(c, 400, "Неправильное расширение файла")
+	if ext == "" {
+		service.ErrorResponse(c, 400, "Файл должен иметь расширение")
 		return
 	}
 
-	core_name, err := service.GenerateUniqueFileName(file_name+".pdf", "./shared/files")
+	core_name, err := service.GenerateUniqueFileName(file_name+ext, "./shared/files")
 	if err != nil {
 		service.ErrorResponse(c, 400, "Плохое название файла: "+err.Error())
 		return

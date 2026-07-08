@@ -335,13 +335,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "PDF файл",
+                        "description": "Файл",
                         "name": "file",
                         "in": "formData"
                     },
                     {
                         "type": "string",
-                        "description": "Имя файла (без .pdf)",
+                        "description": "Имя файла (без расширения)",
                         "name": "file_name",
                         "in": "formData",
                         "required": true
@@ -577,7 +577,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Создаёт новое руководство в БД. Возвращает массив только с созданным руководством. Достуно только админу. Картинка прикрепляется через ручку главных картинок, как к товарам. Файл прикрепляется ручкой в админке.",
+                "description": "Создаёт новое руководство в БД. Возвращает массив только с созданным руководством. Достуно только админу. Картинка прикрепляется через ручку главных картинок, как к товарам. Файл прикрепляется ручкой в админке. Файл пишется здесь с расширением",
                 "consumes": [
                     "application/json"
                 ],
@@ -1935,6 +1935,9 @@ const docTemplate = `{
         "dto.AddManualBody": {
             "type": "object",
             "properties": {
+                "company": {
+                    "type": "string"
+                },
                 "file_name": {
                     "type": "string"
                 },
@@ -2151,6 +2154,9 @@ const docTemplate = `{
         "dto.Manual": {
             "type": "object",
             "properties": {
+                "company": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },

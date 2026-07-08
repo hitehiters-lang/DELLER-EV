@@ -31,8 +31,9 @@ func AddManual(c *gin.Context, body dto.AddManualBody) (schema.Manuals, error) {
 	new_manual := schema.Manuals{
 		Slug:      body.Slug,
 		Name:      body.Name,
+		Company:   body.Company,
 		ImagePath: "/images/" + body.ImageName + ".png",
-		FilePath:  "/files/" + body.FileName + ".pdf",
+		FilePath:  "/files/" + body.FileName,
 		CreatedAt: time.Now(),
 	}
 	ctx := c.Request.Context()

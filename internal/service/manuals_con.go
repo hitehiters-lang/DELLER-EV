@@ -12,6 +12,7 @@ func ConvertManuals(m []schema.Manuals, t int, code string) dto.ManualResponse {
 		uals := dto.Manual{
 			Id:        e.Id,
 			Slug:      e.Slug,
+			Company:   e.Company,
 			Name:      pkgtrans.TranslateText("manual_name_"+e.Slug, e.Name, code),
 			ImagePath: e.ImagePath,
 			FilePath:  e.FilePath,
