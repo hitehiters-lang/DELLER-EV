@@ -1818,7 +1818,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "{\"message\": \"Заказ принят, ждите звонка.\"}"
+                        "description": "{\"message\": \"Заказ принят, ждите звонка или письмо на электронную почту.\"}"
                     },
                     "400": {
                         "description": "Bad Request",

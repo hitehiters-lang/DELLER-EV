@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func AddOrder(c *gin.Context, body dto.CreateOrder) error {
+func AddOrder(c *gin.Context, body dto.CreateOrder) (schema.Orders, []schema.OrderProducts, error) {
 
 	order_uuid, _ := uuid.NewV7()
 	new_order := schema.Orders{
@@ -30,10 +30,10 @@ func AddOrder(c *gin.Context, body dto.CreateOrder) error {
 
 		err, _, p := GetProductDetail(c, e.ProductSlug)
 		if err != nil {
-			return err
+			return schema.Orders{}, []schema.OrderProducts{}, err
 		}
 		if e.Quantity < 1 {
-			return sql.ErrNoRows
+			return schema.Orders{}, []schema.OrderProducts{}, sql.ErrNoRows
 		}
 		pwd := p.Price - int(float64(p.Price)*(float64(p.Discount)/100))
 
@@ -54,20 +54,31 @@ func AddOrder(c *gin.Context, body dto.CreateOrder) error {
 	tx, err := db.BeginTx(ctx, nil)
 	defer tx.Rollback()
 	if err != nil {
-		return err
+		return schema.Orders{}, []schema.OrderProducts{}, err
 	}
 
 	_, err = tx.NewInsert().Model(&new_order).Exec(ctx)
 	if err != nil {
-		return err
+		return schema.Orders{}, []schema.OrderProducts{}, err
 	}
 	_, err = tx.NewInsert().Model(&prods).Exec(ctx)
 	if err != nil {
-		return err
+		return schema.Orders{}, []schema.OrderProducts{}, err
+	}
+
+	var sel_order schema.Orders
+	var sel_prods []schema.OrderProducts
+	err = tx.NewSelect().Model(&sel_order).Where("id = ?", order_uuid).Scan(ctx)
+	if err != nil {
+		return schema.Orders{}, []schema.OrderProducts{}, err
+	}
+	err = tx.NewSelect().Model(&sel_prods).Where("order_id = ?", sel_order.Id).Relation("Product").Scan(ctx)
+	if err != nil {
+		return schema.Orders{}, []schema.OrderProducts{}, err
 	}
 
 	err = tx.Commit()
-	return err
+	return sel_order, sel_prods, err
 }
 
 func CheckOrder(c *gin.Context, order_id uuid.UUID) error {

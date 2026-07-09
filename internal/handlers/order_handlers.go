@@ -7,6 +7,7 @@ import (
 	"deller/internal/repository"
 	"deller/internal/service"
 	"errors"
+	"net/mail"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -19,7 +20,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param order body dto.CreateOrder true "Данные заказа"
-// @Success 201 "{"message": "Заказ принят, ждите звонка."}"
+// @Success 201 "{"message": "Заказ принят, ждите звонка или письмо на электронную почту."}"
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 403 {object} dto.ErrorMessage
 // @Failure 409 {object} dto.ErrorMessage
@@ -36,7 +37,14 @@ func AddOrder(c *gin.Context) {
 		service.ErrorResponse(c, 400, "Превышен лимит максимального количества товаров")
 		return
 	}
-	err := repository.AddOrder(c, body)
+
+	_, err := mail.ParseAddress(body.Email)
+	if err != nil {
+		service.ErrorResponse(c, 400, "Невалидный Email")
+		return
+	}
+
+	order, prods, err := repository.AddOrder(c, body)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			service.ErrorResponse(c, 400, "Плохой запрос")
@@ -45,7 +53,8 @@ func AddOrder(c *gin.Context) {
 		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
 		return
 	}
-
+	service.MailToOrderer(order, prods)
+	service.MailToAdmin(order, prods)
 	c.JSON(201, map[string]string{"message": "Заказ принят, ждите звонка или письмо на электронную почту."})
 }
 

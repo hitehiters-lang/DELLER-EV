@@ -28,7 +28,7 @@ type CreateOrder struct {
 	PhoneNumber string         `json:"phone_number"`
 	Email       string         `json:"email"`
 	Address     string         `json:"address"`
-	Comment     string         `json:"comment"`
+	Comment     string         `json:"comment,omitempty"`
 	Products    []OrderProduct `json:"products"`
 }
 

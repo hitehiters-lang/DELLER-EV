@@ -15,6 +15,9 @@ type Config struct {
 	ServerPort   string
 	JwtSecret    string
 	LibreSecret  string
+	GmailMailTo  string
+	GmailMail    string
+	GmailPass    string
 }
 
 var cfg Config
@@ -30,6 +33,9 @@ func LoadENV() {
 	cfg.ServerPort = os.Getenv("SERVER_PORT")
 	cfg.JwtSecret = os.Getenv("JWT_SECRET")
 	cfg.LibreSecret = os.Getenv("LIBRE_SECRET")
+	cfg.GmailMailTo = os.Getenv("GMAIL_MAIL_TO")
+	cfg.GmailMail = os.Getenv("GMAIL_MAIL")
+	cfg.GmailPass = os.Getenv("GMAIL_PASS")
 
 	if cfg.DatabaseHost == "" {
 		cfg.DatabaseHost = "localhost"
@@ -67,4 +73,8 @@ func GetJwt() string {
 
 func GetLibre() string {
 	return cfg.LibreSecret
+}
+
+func GetMail() (string, string, string) {
+	return cfg.GmailMail, cfg.GmailPass, cfg.GmailMailTo
 }
