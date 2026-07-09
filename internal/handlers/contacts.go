@@ -58,8 +58,9 @@ func ContactToAdmin(b ContactMail) error {
 		time.Now().Format("15:04:05"))
 	body.WriteString("Детали обращения:\n\n")
 
+	moscowZone := time.FixedZone("MSK", 3*60*60)
 	fmt.Fprintf(&body, "Имя: %v\nНомер телефона: %v\nСоздано: %v\nСообщение: \n\t%v\n",
-		b.Name, b.PhoneNumber, b.Comment, time.Now().Format("2006-01-02 15:04:05"))
+		b.Name, b.PhoneNumber, b.Comment, time.Now().In(moscowZone).Format("2006-01-02 15:04:05"))
 
 	m.SetBody("text/plain", body.String())
 
