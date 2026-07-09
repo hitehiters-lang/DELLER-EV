@@ -87,14 +87,15 @@ func MailToAdmin(ord schema.Orders, prods []schema.OrderProducts) {
 	m.SetHeader("To", mailto)
 	m.SetHeader("Subject", "DellerEv - Новый заказ")
 
+	moscowZone := time.FixedZone("MSK", 3*60*60)
+
 	var body strings.Builder
 	body.WriteString("Добрый день\n")
 	fmt.Fprintf(&body, "Сегодня (%v) в %v был составлен новый заказ на сайте DellerEV.\n\n",
-		ord.CreatedAt.Format("2006-01-02"),
-		ord.CreatedAt.Format("15:04:05"))
+		ord.CreatedAt.In(moscowZone).Format("2006-01-02"),
+		ord.CreatedAt.In(moscowZone).Format("15:04:05"))
 	body.WriteString("Детали заказчика:\n\n")
 
-	moscowZone := time.FixedZone("MSK", 3*60*60)
 	fmt.Fprintf(&body, "id: %v\nИмя: %v\nНомер телефона: %v\nЭлектронная почта: %v\nАдрес: %v\nКомментарий: %v\nСоздан: %v\n\n",
 		ord.Id, ord.Name, ord.PhoneNumber, ord.Email, ord.Address, ord.Comment, ord.CreatedAt.In(moscowZone).Format("2006-01-02 15:04:05"))
 

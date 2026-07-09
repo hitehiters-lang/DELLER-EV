@@ -51,14 +51,15 @@ func ContactToAdmin(b ContactMail) error {
 	m.SetHeader("To", mailto)
 	m.SetHeader("Subject", "DellerEv - Новое обращение")
 
+	moscowZone := time.FixedZone("MSK", 3*60*60)
+
 	var body strings.Builder
 	body.WriteString("Добрый день\n")
 	fmt.Fprintf(&body, "Сегодня (%v) в %v было составлено новое обращение на сайте DellerEV.\n\n",
-		time.Now().Format("2006-01-02"),
-		time.Now().Format("15:04:05"))
+		time.Now().In(moscowZone).Format("2006-01-02"),
+		time.Now().In(moscowZone).Format("15:04:05"))
 	body.WriteString("Детали обращения:\n\n")
 
-	moscowZone := time.FixedZone("MSK", 3*60*60)
 	fmt.Fprintf(&body, "Имя: %v\nНомер телефона: %v\nСоздано: %v\nСообщение: \n\t%v\n",
 		b.Name, b.PhoneNumber, b.Comment, time.Now().In(moscowZone).Format("2006-01-02 15:04:05"))
 
