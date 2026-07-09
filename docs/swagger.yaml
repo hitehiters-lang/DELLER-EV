@@ -350,6 +350,8 @@ definitions:
         items:
           $ref: '#/definitions/dto.ProductImage'
         type: array
+      is_trending:
+        type: boolean
       main_image:
         type: string
       name:

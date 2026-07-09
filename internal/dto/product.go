@@ -41,6 +41,7 @@ type ProductDetail struct {
 	DeletedAt         time.Time      `json:"deleted_at"`
 	PriceWithDiscount int            `json:"price_with_discount"`
 	MainImage         string         `json:"main_image"`
+	IsTrending        bool           `json:"is_trending"`
 	Specification     Specification  `json:"specification"`
 	Images            []ProductImage `json:"images"`
 }

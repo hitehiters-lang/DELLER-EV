@@ -110,6 +110,7 @@ func ConvertProductDetail(p schema.Products, v []dto.ProductImage, code string) 
 		DeletedAt:         p.DeletedAt,
 		PriceWithDiscount: pwd,
 		MainImage:         p.MainImage,
+		IsTrending:        p.IsTrending,
 		Specification:     spec,
 		Images:            v,
 	}

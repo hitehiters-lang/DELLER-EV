@@ -2620,6 +2620,9 @@ const docTemplate = `{
                         "$ref": "#/definitions/dto.ProductImage"
                     }
                 },
+                "is_trending": {
+                    "type": "boolean"
+                },
                 "main_image": {
                     "type": "string"
                 },
