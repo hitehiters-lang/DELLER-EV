@@ -1741,6 +1741,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/contact": {
+            "post": {
+                "description": "Отправляет письмо на почту компании",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Связь"
+                ],
+                "summary": "Отправить письмо",
+                "operationId": "contact_us",
+                "parameters": [
+                    {
+                        "description": "Поля ввода",
+                        "name": "contacter",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ContactMail"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"message\": \"Успешно! Ждите звонка, мы с вами свяжемся.\"}"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/manuals": {
             "get": {
                 "description": "Возвращает все данные о руководствах",
@@ -2862,6 +2906,20 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ContactMail": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
                     "type": "string"
                 }
             }

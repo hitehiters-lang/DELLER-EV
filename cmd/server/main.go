@@ -60,6 +60,7 @@ func main() {
 		api.GET("/products/:id/reviews", handlers.GetProductReviews)
 
 		api.POST("/orders", handlers.AddOrder)
+		api.POST("/contact", handlers.Contact)
 
 		auth := api.Group("")
 		auth.Use(pkgauth.JWTAuthMiddleware())

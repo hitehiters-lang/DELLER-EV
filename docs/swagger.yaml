@@ -510,6 +510,15 @@ definitions:
       name:
         type: string
     type: object
+  handlers.ContactMail:
+    properties:
+      comment:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+    type: object
 info:
   contact: {}
   description: Документация к API.
@@ -1651,6 +1660,35 @@ paths:
       summary: Получить все товары определённой категории
       tags:
       - Товары
+  /contact:
+    post:
+      consumes:
+      - application/json
+      description: Отправляет письмо на почту компании
+      operationId: contact_us
+      parameters:
+      - description: Поля ввода
+        in: body
+        name: contacter
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ContactMail'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"message": "Успешно! Ждите звонка, мы с вами свяжемся."}'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Отправить письмо
+      tags:
+      - Связь
   /manuals:
     get:
       consumes:
