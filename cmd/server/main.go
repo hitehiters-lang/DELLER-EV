@@ -6,6 +6,7 @@ import (
 	"deller/internal/database"
 	"deller/internal/handlers"
 	pkgauth "deller/internal/pkg/auth"
+	pkgblog "deller/internal/pkg/blog_gen"
 	pkgtrans "deller/internal/pkg/translator"
 	"net/http"
 
@@ -33,6 +34,8 @@ func main() {
 	if err != nil {
 		return
 	}
+
+	pkgblog.Start()
 
 	r := gin.Default()
 	r.Use(cors.Default())
