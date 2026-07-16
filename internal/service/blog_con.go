@@ -7,7 +7,6 @@ import (
 	"errors"
 	"strconv"
 	"strings"
-	"time"
 	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
@@ -120,7 +119,7 @@ func ConvertComments(c []schema.Comments, t int) dto.CommentResponse {
 			AuthorIsAdmin:      e.Author.IsAdmin,
 			AuthorIsPostAuthor: false,
 			PostSlug:           e.Post.Slug,
-			CreatedAt:          time.Now(),
+			CreatedAt:          e.CreatedAt,
 		}
 		if e.Parent != nil {
 			ment.ParentId = e.ParentId
