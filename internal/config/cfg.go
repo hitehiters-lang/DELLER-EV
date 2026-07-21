@@ -8,22 +8,22 @@ import (
 )
 
 type Config struct {
-	DatabaseHost         string
-	DatabasePort         string
-	DatabaseUser         string
-	DatabasePass         string
-	DatabaseName         string
-	ServerPort           string
-	JwtSecret            string
-	LibreSecret          string
-	GmailMailTo          string
-	GmailMail            string
-	GmailPass            string
-	GigaChatAPIKey       string
-	GigaChatModel        string
-	GigaChatAPIURL       string
-	GigaChatScope        string
-	AIAuthorID           string
+	DatabaseHost   string
+	DatabasePort   string
+	DatabaseUser   string
+	DatabasePass   string
+	DatabaseName   string
+	ServerPort     string
+	JwtSecret      string
+	LibreSecret    string
+	GmailMailTo    string
+	GmailMail      string
+	GmailPass      string
+	GigaChatAPIKey string
+	GigaChatModel  string
+	GigaChatAPIURL string
+	GigaChatScope  string
+	AIAuthorID     string
 }
 
 var cfg Config

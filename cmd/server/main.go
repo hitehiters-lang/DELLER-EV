@@ -100,6 +100,9 @@ func main() {
 			auth.POST("/admin/manuals", handlers.AddManual)
 			auth.DELETE("/admin/manuals/:slug", handlers.DelManual)
 
+			auth.POST("/admin/xlsx-import", handlers.ImportPricesFromXlsx)
+			auth.GET("/admin/xlsx-export", handlers.ExportPricesToXlsx)
+
 			auth.POST("/admin/cache", handlers.CacheAll)
 		}
 	}

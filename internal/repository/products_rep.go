@@ -449,3 +449,44 @@ func CheckForRevRepeat(c *gin.Context, id string) (bool, error) {
 		Exists(ctx)
 	return bl, err
 }
+
+func GetAllProductsForExport(c *gin.Context) (error, []schema.Products, map[string]string) {
+	var products []schema.Products
+	var categories []schema.Categories
+	ctx := c.Request.Context()
+	db := database.GetDatabase()
+
+	err := db.NewSelect().Model(&products).
+		Where("deleted_at IS NULL").
+		Order("category_id", "name").
+		Scan(ctx)
+	if err != nil {
+		return err, nil, nil
+	}
+
+	err = db.NewSelect().Model(&categories).Scan(ctx)
+	if err != nil {
+		return err, nil, nil
+	}
+
+	catMap := make(map[string]string)
+	for _, cat := range categories {
+		catMap[cat.Id] = cat.Name
+	}
+
+	return nil, products, catMap
+}
+
+func GetProductsByCategoryForExport(c *gin.Context, catID string) (error, []schema.Products) {
+	var products []schema.Products
+	ctx := c.Request.Context()
+	db := database.GetDatabase()
+
+	err := db.NewSelect().Model(&products).
+		Where("category_id = ?", catID).
+		Where("deleted_at IS NULL").
+		Order("name").
+		Scan(ctx)
+
+	return err, products
+}

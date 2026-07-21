@@ -24,6 +24,7 @@ type Product struct {
 	PriceWithDiscount int       `json:"price_with_discount"`
 	MainImage         string    `json:"main_image"`
 	IsTrending        bool      `json:"is_trending"`
+	XlsxName          string    `json:"xlsx_name"`
 }
 
 type ProductDetail struct {
@@ -42,6 +43,7 @@ type ProductDetail struct {
 	PriceWithDiscount int            `json:"price_with_discount"`
 	MainImage         string         `json:"main_image"`
 	IsTrending        bool           `json:"is_trending"`
+	XlsxName          string         `json:"xlsx_name"`
 	Specification     Specification  `json:"specification"`
 	Images            []ProductImage `json:"images"`
 }

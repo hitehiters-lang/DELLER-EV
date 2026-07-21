@@ -331,6 +331,8 @@ definitions:
         type: string
       spec:
         type: string
+      xlsx_name:
+        type: string
     type: object
   dto.ProductDetail:
     properties:
@@ -371,6 +373,8 @@ definitions:
           type: string
         type: array
       updated_at:
+        type: string
+      xlsx_name:
         type: string
     type: object
   dto.ProductImage:
@@ -508,6 +512,38 @@ definitions:
       is_admin:
         type: boolean
       name:
+        type: string
+    type: object
+  dto.XlsxImportResponse:
+    properties:
+      details:
+        items:
+          $ref: '#/definitions/dto.XlsxRowDetail'
+        type: array
+      errors:
+        type: integer
+      matched:
+        type: integer
+      not_found:
+        type: integer
+      total:
+        type: integer
+      updated:
+        type: integer
+    type: object
+  dto.XlsxRowDetail:
+    properties:
+      error:
+        type: string
+      name:
+        type: string
+      new_price:
+        type: integer
+      old_price:
+        type: integer
+      row:
+        type: integer
+      status:
         type: string
     type: object
   handlers.ContactMail:
@@ -1295,6 +1331,142 @@ paths:
       summary: Удалить отзыв
       tags:
       - Отзывы
+  /admin/xlsx-export:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Экспортирует товары в XLSX-файл в формате прайс-листа DellerQS. Файл содержит шапку с реквизитами компании и список товаров с ценами.
+
+        ### Параметр category
+        - `all` — все товары, сгруппированные по категориям. Между группами — пустая строка-разделитель.
+        - `id категории` — товары только указанной категории, без разделителей.
+
+        ### Название товара в экспорте
+        Используется поле `xlsx_name`. Если оно не заполнено — `name`.
+
+        ### Формат цены
+        Цена пишется как число с пользовательским форматом `#,##0 "р."` — Excel отобразит `16,590 р.`.
+
+        ### Для фронтендера
+        [CODEX] Добавь на страницу импорта XLSX кнопку «Экспортировать прайс-лист».
+        Выпадающий список с категориями + опция «Все категории». При выборе — GET-запрос на этот эндпоинт с параметром `?category=all` или `?category=<id>`.
+        Ответ — файл `.xlsx`, сохраняй через `Content-Disposition: attachment; filename=price.xlsx`.
+      operationId: xlsx_export
+      parameters:
+      - description: id категории или 'all' для всех
+        in: query
+        name: category
+        required: true
+        type: string
+      produces:
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Экспорт прайс-листа в XLSX
+      tags:
+      - Админ
+  /admin/xlsx-import:
+    post:
+      consumes:
+      - multipart/form-data
+      description: |-
+        Загружает XLSX-файл с ценами, сопоставляет товары по полю xlsx_name в БД и обновляет цены пачкой в одной транзакции. Файл удаляется после обработки.
+
+        ### Как работают колонки
+        Модуль **автоматически определяет** колонки с именем и ценой в каждой строке:
+        - **Колонка имени**: первая непустая ячейка в строке.
+        - **Колонка цены**: следующая ячейка сразу за колонкой имени.
+
+        ### Нормализация пробелов
+        Перед сопоставлением все пробельные символы в названии (и из XLSX, и из БД) схлопываются до одного пробела через `strings.Fields` + `strings.Join`.
+        Это значит, что `"Электромотор  Deller   QSD90A-80      1,0 кВт"` и `"Электромотор Deller QSD90A-80 1,0 кВт"` считаются одним и тем же товаром.
+
+        ### Парсинг цены
+        Из строки цены удаляются суффиксы `р.`, `р`, `руб.`, `руб`, запятые и пробелы, после чего значение преобразуется в `int`.
+        Примеры: `"16,590 р."` → `16590`, `"480 р."` → `480`.
+
+        ### Сопоставление с БД
+        Товары сопоставляются **точным совпадением** (после нормализации пробелов) текста из колонки имени с полем `xlsx_name` в таблице `products`.
+        Если поле `xlsx_name` у товара не заполнено — он не участвует в сопоставлении.
+
+        ### Фильтрация мусора
+        Строки без цены, с непарсящейся ценой, а также полностью пустые строки — пропускаются.
+
+        ---
+
+        ### [CODEX] Инструкция для фронтендера
+
+        **1. xlsx_name в API-ответах.**
+        Поле `xlsx_name` теперь возвращается во **всех** роутах, где фигурирует товар:
+        - `GET /categories/:id` — в каждом объекте `Product` внутри `ProductsResponse`
+        - `GET /products/:id` — в `ProductDetail`
+        - `GET /products/:id/relative` — в каждом объекте `Product`
+        Используй это поле чтобы показывать xlsx_name в админке (в списке товаров, при редактировании) и чтобы администратор видел, по какому ключу товар сопоставляется с прайс-листом.
+
+        **2. Страница импорта XLSX (новая).**
+        Добавь в админ-панель страницу «Импорт цен из XLSX» с формой загрузки файла. Рядом с формой размести пояснение для пользователя:
+        > «Загрузите XLSX-файл с прайс-листом. В каждой строке первая непустая ячейка считается названием товара, следующая за ней — ценой. Название товара из XLSX сравнивается с полем xlsx_name в базе. Лишние пробелы в названиях игнорируются. Пример корректной строки: колонка A (пусто), колонка B — "Электромотор Deller QSD90A-80 1,0 кВт V1/V2", колонка C — "16,590 р."»
+        После загрузки показывай результат в таблице: строка в файле | название | статус (updated / not_found / parse_error / unchanged) | старая цена | новая цена | ошибка.
+
+        **3. Форма добавления/редактирования товара (доработка существующей).**
+        При вводе названия товара (поле `name`) автоматически заполняй:
+        - `slug` — транслитерация названия латиницей, пробелы → дефисы, только `[a-z0-9-]`. Используй готовую функцию с бекенда или сделай на фронте (пример: `"Электромотор Deller QSD90A-80 1,0 кВт"` → `"elektromotor-deller-qsd90a-80-1-0-kvt"`).
+        - `xlsx_name` — формируется как **«[Категория в единственном числе] [Название товара]»**. Например: категория «Электромотоциклы» → единственное число «Электромотоцикл», товар «DellerБайк Электро 400» → `xlsx_name` = `"Электромотоцикл DellerБайк Электро 400"`. Категорию приводи к единственному числу через словарь замен (простой mapping на фронте: «Электромоторы»→«Электромотор», «Контроллеры»→«Контроллер», «Батареи»→«Батарея», «Зарядные устройства»→«Зарядное устройство», «Электромотоциклы»→«Электромотоцикл», «Электропитбайки»→«Электропитбайк», «Карты электро»→«Карт электро», «Аксессуары»→«Аксессуар» и т.д.). Если категория не найдена в словаре — просто отрезай последнюю букву (грубая эвристика).
+        Поле `xlsx_name` должно быть видимым и редактируемым в форме (на случай если название в прайс-листе отличается от сгенерированного).
+
+        **4. Ручное управление xlsx_name.**
+        В списке товаров админки добавь колонку `xlsx_name` (или показывай при редактировании), чтобы администратор мог проверить/подправить значение, по которому идёт сопоставление с прайсом.
+
+        **Важно:** xlsx_name в БД храни как есть, без нормализации. Нормализация пробелов происходит только на бекенде в момент сопоставления — множественные пробелы схлопываются при сравнении.
+      operationId: xlsx_import
+      parameters:
+      - description: XLSX-файл с ценами
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.XlsxImportResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Импорт цен из XLSX
+      tags:
+      - Админ
   /auth/login:
     post:
       consumes:

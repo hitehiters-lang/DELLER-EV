@@ -29,6 +29,7 @@ type Products struct {
 	DeletedAt   time.Time `bun:"deleted_at,nullzero"`
 	MainImage   string    `bun:"main_image"`
 	IsTrending  bool      `bun:"is_trending"`
+	XlsxName    string    `bun:"xlsx_name"`
 
 	Specification *MotoSpecifications `bun:"rel:belongs-to,join:spec=id"`
 }
