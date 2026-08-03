@@ -4,7 +4,7 @@
         "description": "Документация к API.",
         "title": "Deller-Ev API",
         "contact": {},
-        "version": "1.0"
+        "version": "1.1"
     },
     "basePath": "/",
     "paths": {
@@ -1867,7 +1867,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.ContactMail"
+                            "$ref": "#/definitions/dto.ContactMail"
                         }
                     }
                 ],
@@ -2305,6 +2305,9 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "xlsx_name": {
+                    "type": "string"
                 }
             }
         },
@@ -2432,6 +2435,20 @@
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.ContactMail": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
                 }
             }
         },
@@ -3066,20 +3083,6 @@
                     "type": "integer"
                 },
                 "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "handlers.ContactMail": {
-            "type": "object",
-            "properties": {
-                "comment": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone_number": {
                     "type": "string"
                 }
             }

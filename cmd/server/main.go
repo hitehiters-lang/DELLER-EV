@@ -23,7 +23,7 @@ import (
 // @description Введите JWT токен
 
 // @title Deller-Ev API
-// @version 1.0
+// @version 1.1
 // @description Документация к API.
 // @BasePath /
 func main() {
@@ -39,6 +39,7 @@ func main() {
 
 	r := gin.Default()
 	r.Use(cors.Default())
+	r.MaxMultipartMemory = 8 << 20
 
 	api := r.Group("/api/v1")
 	{

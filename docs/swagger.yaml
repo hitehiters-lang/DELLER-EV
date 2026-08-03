@@ -49,6 +49,8 @@ definitions:
         items:
           type: string
         type: array
+      xlsx_name:
+        type: string
     type: object
   dto.AdditionalSpec:
     properties:
@@ -132,6 +134,15 @@ definitions:
         type: array
       total:
         type: integer
+    type: object
+  dto.ContactMail:
+    properties:
+      comment:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
     type: object
   dto.CreateOrder:
     properties:
@@ -546,20 +557,11 @@ definitions:
       status:
         type: string
     type: object
-  handlers.ContactMail:
-    properties:
-      comment:
-        type: string
-      name:
-        type: string
-      phone_number:
-        type: string
-    type: object
 info:
   contact: {}
   description: Документация к API.
   title: Deller-Ev API
-  version: "1.0"
+  version: "1.1"
 paths:
   /admin/cache:
     post:
@@ -1844,7 +1846,7 @@ paths:
         name: contacter
         required: true
         schema:
-          $ref: '#/definitions/handlers.ContactMail'
+          $ref: '#/definitions/dto.ContactMail'
       produces:
       - application/json
       responses:

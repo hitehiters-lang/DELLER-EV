@@ -181,7 +181,7 @@ func BindPicture(c *gin.Context) {
 		service.ErrorResponse(c, 400, "Ошибка")
 		return
 	}
-	dst := "./shared/" + core_name
+	dst := "./shared/images/" + core_name
 	if err := c.SaveUploadedFile(file, dst); err != nil {
 		service.ErrorResponse(c, 500, "Не удалось сохранить файл: "+err.Error())
 		repository.DeletePicture(c, pic_uuid)

@@ -24,6 +24,7 @@ type AddProductBody struct {
 	Discount      int            `json:"discount"`
 	Tags          []string       `json:"tags"`
 	MainImage     string         `json:"main_image" example:"/images/example.png"`
+	XlsxName      string         `json:"xlsx_name"`
 	Specification AdditionalSpec `json:"specification"`
 	IsTrending    bool           `json:"is_trending"`
 }
@@ -53,6 +54,7 @@ type PutProductBody struct {
 	Discount      int            `json:"discount"`
 	Tags          []string       `json:"tags"`
 	MainImage     string         `json:"main_image" example:"/images/example.png"`
+	XlsxName      string         `json:"xlsx_name"`
 	Specification AdditionalSpec `json:"specification"`
 	IsTrending    bool           `json:"is_trending"`
 }

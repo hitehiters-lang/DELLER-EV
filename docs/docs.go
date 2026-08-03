@@ -1874,7 +1874,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.ContactMail"
+                            "$ref": "#/definitions/dto.ContactMail"
                         }
                     }
                 ],
@@ -2312,6 +2312,9 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "xlsx_name": {
+                    "type": "string"
                 }
             }
         },
@@ -2439,6 +2442,20 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.ContactMail": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
                 }
             }
         },
@@ -3076,20 +3093,6 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
-        },
-        "handlers.ContactMail": {
-            "type": "object",
-            "properties": {
-                "comment": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                }
-            }
         }
     },
     "securityDefinitions": {
@@ -3104,7 +3107,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "1.1",
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},

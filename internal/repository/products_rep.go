@@ -199,6 +199,7 @@ func AddProduct(c *gin.Context, body dto.AddProductBody) (schema.Products, error
 		Discount:    body.Discount,
 		Tags:        body.Tags,
 		CreatedAt:   time.Now(),
+		XlsxName:    body.XlsxName,
 		MainImage:   body.MainImage,
 		IsTrending:  body.IsTrending,
 	}
@@ -286,6 +287,7 @@ func PutProduct(c *gin.Context, body dto.PutProductBody, id string) (schema.Prod
 		Tags:        body.Tags,
 		CreatedAt:   prod.CreatedAt,
 		UpdatedAt:   time.Now(),
+		XlsxName:    body.XlsxName,
 		MainImage:   body.MainImage,
 		IsTrending:  body.IsTrending,
 	}
