@@ -25,6 +25,8 @@ type Product struct {
 	MainImage         string    `json:"main_image"`
 	IsTrending        bool      `json:"is_trending"`
 	XlsxName          string    `json:"xlsx_name"`
+	OnRequest         bool      `json:"on_request"`
+	OnStock           bool      `json:"on_stock"`
 }
 
 type ProductDetail struct {
@@ -45,6 +47,8 @@ type ProductDetail struct {
 	IsTrending        bool           `json:"is_trending"`
 	XlsxName          string         `json:"xlsx_name"`
 	Specification     Specification  `json:"specification"`
+	OnRequest         bool           `json:"on_request"`
+	OnStock           bool           `json:"on_stock"`
 	Images            []ProductImage `json:"images"`
 }
 

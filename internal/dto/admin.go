@@ -27,6 +27,8 @@ type AddProductBody struct {
 	XlsxName      string         `json:"xlsx_name"`
 	Specification AdditionalSpec `json:"specification"`
 	IsTrending    bool           `json:"is_trending"`
+	OnRequest     bool           `json:"on_request"`
+	OnStock       bool           `json:"on_stock"`
 }
 type AdditionalSpec struct {
 	Gear               string `json:"gear"`
@@ -57,6 +59,8 @@ type PutProductBody struct {
 	XlsxName      string         `json:"xlsx_name"`
 	Specification AdditionalSpec `json:"specification"`
 	IsTrending    bool           `json:"is_trending"`
+	OnRequest     bool           `json:"on_request"`
+	OnStock       bool           `json:"on_stock"`
 }
 type PutCategoryBody struct {
 	Id        string `json:"id"`

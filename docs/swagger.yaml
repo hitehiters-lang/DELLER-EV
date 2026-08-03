@@ -39,6 +39,10 @@ definitions:
         type: string
       name:
         type: string
+      on_request:
+        type: boolean
+      on_stock:
+        type: boolean
       price:
         type: integer
       short:
@@ -334,6 +338,10 @@ definitions:
         type: string
       name:
         type: string
+      on_request:
+        type: boolean
+      on_stock:
+        type: boolean
       price:
         type: integer
       price_with_discount:
@@ -369,6 +377,10 @@ definitions:
         type: string
       name:
         type: string
+      on_request:
+        type: boolean
+      on_stock:
+        type: boolean
       price:
         type: integer
       price_with_discount:

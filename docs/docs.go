@@ -2298,6 +2298,12 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "on_request": {
+                    "type": "boolean"
+                },
+                "on_stock": {
+                    "type": "boolean"
+                },
                 "price": {
                     "type": "integer"
                 },
@@ -2752,6 +2758,12 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "on_request": {
+                    "type": "boolean"
+                },
+                "on_stock": {
+                    "type": "boolean"
+                },
                 "price": {
                     "type": "integer"
                 },
@@ -2804,6 +2816,12 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "on_request": {
+                    "type": "boolean"
+                },
+                "on_stock": {
+                    "type": "boolean"
                 },
                 "price": {
                     "type": "integer"

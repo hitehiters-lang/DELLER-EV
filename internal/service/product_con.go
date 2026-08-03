@@ -62,6 +62,8 @@ func ConvertProducts(p []schema.Products, code string) dto.ProductsResponse {
 			MainImage:         e.MainImage,
 			IsTrending:        e.IsTrending,
 			XlsxName:          e.XlsxName,
+			OnRequest:         e.OnRequest,
+			OnStock:           e.OnStock,
 		}
 		prod = append(prod, uct)
 		total++
@@ -115,6 +117,8 @@ func ConvertProductDetail(p schema.Products, v []dto.ProductImage, code string) 
 		XlsxName:          p.XlsxName,
 		Specification:     spec,
 		Images:            v,
+		OnRequest:         p.OnRequest,
+		OnStock:           p.OnStock,
 	}
 	return product
 }

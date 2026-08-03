@@ -290,6 +290,8 @@ func PutProduct(c *gin.Context, body dto.PutProductBody, id string) (schema.Prod
 		XlsxName:    body.XlsxName,
 		MainImage:   body.MainImage,
 		IsTrending:  body.IsTrending,
+		OnRequest:   body.OnRequest,
+		OnStock:     body.OnStock,
 	}
 
 	tx, err := db.BeginTx(ctx, nil)

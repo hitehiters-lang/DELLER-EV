@@ -2291,6 +2291,12 @@
                 "name": {
                     "type": "string"
                 },
+                "on_request": {
+                    "type": "boolean"
+                },
+                "on_stock": {
+                    "type": "boolean"
+                },
                 "price": {
                     "type": "integer"
                 },
@@ -2745,6 +2751,12 @@
                 "name": {
                     "type": "string"
                 },
+                "on_request": {
+                    "type": "boolean"
+                },
+                "on_stock": {
+                    "type": "boolean"
+                },
                 "price": {
                     "type": "integer"
                 },
@@ -2797,6 +2809,12 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "on_request": {
+                    "type": "boolean"
+                },
+                "on_stock": {
+                    "type": "boolean"
                 },
                 "price": {
                     "type": "integer"

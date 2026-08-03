@@ -30,6 +30,8 @@ type Products struct {
 	MainImage   string    `bun:"main_image"`
 	IsTrending  bool      `bun:"is_trending"`
 	XlsxName    string    `bun:"xlsx_name"`
+	OnRequest   bool      `bun:"on_request"`
+	OnStock     bool      `bun:"on_stock"`
 
 	Specification *MotoSpecifications `bun:"rel:belongs-to,join:spec=id"`
 }
