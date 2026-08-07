@@ -15,23 +15,25 @@ type Categories struct {
 }
 
 type Products struct {
-	Id          string    `bun:"id,pk"`
-	CategoryId  string    `bun:"category_id"`
-	Spec        uuid.UUID `bun:"spec"`
-	Name        string    `bun:"name"`
-	Short       string    `bun:"short"`
-	Description string    `bun:"description"`
-	Price       int       `bun:"price"`
-	Discount    int       `bun:"discount"`
-	Tags        []string  `bun:"tags,array"`
-	CreatedAt   time.Time `bun:"created_at"`
-	UpdatedAt   time.Time `bun:"updated_at,nullzero"`
-	DeletedAt   time.Time `bun:"deleted_at,nullzero"`
-	MainImage   string    `bun:"main_image"`
-	IsTrending  bool      `bun:"is_trending"`
-	XlsxName    string    `bun:"xlsx_name"`
-	OnRequest   bool      `bun:"on_request"`
-	OnStock     bool      `bun:"on_stock"`
+	Id             string    `bun:"id,pk"`
+	CategoryId     string    `bun:"category_id"`
+	Spec           uuid.UUID `bun:"spec"`
+	Name           string    `bun:"name"`
+	Short          string    `bun:"short"`
+	Description    string    `bun:"description"`
+	Price          int       `bun:"price"`
+	Discount       int       `bun:"discount"`
+	Tags           []string  `bun:"tags,array"`
+	CreatedAt      time.Time `bun:"created_at"`
+	UpdatedAt      time.Time `bun:"updated_at,nullzero"`
+	DeletedAt      time.Time `bun:"deleted_at,nullzero"`
+	MainImage      string    `bun:"main_image"`
+	IsTrending     bool      `bun:"is_trending"`
+	XlsxName       string    `bun:"xlsx_name"`
+	OnRequest      bool      `bun:"on_request"`
+	OnStock        bool      `bun:"on_stock"`
+	OnRequestPrice int       `bun:"on_request_price"`
+	OnStockPrice   int       `bun:"on_stock_price"`
 
 	Specification *MotoSpecifications `bun:"rel:belongs-to,join:spec=id"`
 }

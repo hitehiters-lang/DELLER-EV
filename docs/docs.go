@@ -2301,8 +2301,14 @@ const docTemplate = `{
                 "on_request": {
                     "type": "boolean"
                 },
+                "on_request_price": {
+                    "type": "integer"
+                },
                 "on_stock": {
                     "type": "boolean"
+                },
+                "on_stock_price": {
+                    "type": "integer"
                 },
                 "price": {
                     "type": "integer"
@@ -2761,8 +2767,14 @@ const docTemplate = `{
                 "on_request": {
                     "type": "boolean"
                 },
+                "on_request_price": {
+                    "type": "integer"
+                },
                 "on_stock": {
                     "type": "boolean"
+                },
+                "on_stock_price": {
+                    "type": "integer"
                 },
                 "price": {
                     "type": "integer"
@@ -2820,8 +2832,14 @@ const docTemplate = `{
                 "on_request": {
                     "type": "boolean"
                 },
+                "on_request_price": {
+                    "type": "integer"
+                },
                 "on_stock": {
                     "type": "boolean"
+                },
+                "on_stock_price": {
+                    "type": "integer"
                 },
                 "price": {
                     "type": "integer"
@@ -3125,12 +3143,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.1",
+	Version:          "1.11",
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Deller-Ev API",
-	Description:      "Документация к API.",
+	Description:      "Документация к API.\n\nv1.11 Изменения:\n\nРоуты создания/возвращения товаров (/api/v1/products... и /api/v1/admin/products...) теперь возвращают ещё два дополнительных поля:\n\n1. **on_stock_price** (int) - цена товара **В НАЛИЧИИ**. Если равна нулю (или on_stock == false), то на фронте на странице товара не должна отображаться.\n\n2. **on_request_price** (int) - цена товара **НА ЗАКАЗ**. Если равна нулю (или on_request == false), то на фронте на странице товара не должна отображаться.\n\nОба ценовых сегмента могут сосуществовать одновременно, либо отсутствовать. Если любая из новых цен != 0, тогда на странице товара не должна показываться обычная возвращаемая цена (price), а только те что указаны.\n\nОбязательно обновить админ панель на фронте! Нужно добавить в панели создания/изменения товара под переключателем В НАЛИЧИИ/ПОД ЗАКАЗ цены, как раз таки указанные сверху. Сам переключатель сделать необязательным, а вместо радиокнопки использовать флажок (чтобы можно было выбрать и то и то, а также указать и ту и ту цену)",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

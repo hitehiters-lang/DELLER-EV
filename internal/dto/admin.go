@@ -15,20 +15,22 @@ type AddCategoryBody struct {
 	ImageName string `json:"image_name"`
 }
 type AddProductBody struct {
-	Id            string         `json:"id"`
-	CategoryId    string         `json:"category_id"`
-	Name          string         `json:"name"`
-	Short         string         `json:"short"`
-	Description   string         `json:"description"`
-	Price         int            `json:"price"`
-	Discount      int            `json:"discount"`
-	Tags          []string       `json:"tags"`
-	MainImage     string         `json:"main_image" example:"/images/example.png"`
-	XlsxName      string         `json:"xlsx_name"`
-	Specification AdditionalSpec `json:"specification"`
-	IsTrending    bool           `json:"is_trending"`
-	OnRequest     bool           `json:"on_request"`
-	OnStock       bool           `json:"on_stock"`
+	Id             string         `json:"id"`
+	CategoryId     string         `json:"category_id"`
+	Name           string         `json:"name"`
+	Short          string         `json:"short"`
+	Description    string         `json:"description"`
+	Price          int            `json:"price"`
+	Discount       int            `json:"discount"`
+	Tags           []string       `json:"tags"`
+	MainImage      string         `json:"main_image" example:"/images/example.png"`
+	XlsxName       string         `json:"xlsx_name"`
+	Specification  AdditionalSpec `json:"specification"`
+	IsTrending     bool           `json:"is_trending"`
+	OnRequest      bool           `json:"on_request"`
+	OnStock        bool           `json:"on_stock"`
+	OnRequestPrice int            `json:"on_request_price"`
+	OnStockPrice   int            `json:"on_stock_price"`
 }
 type AdditionalSpec struct {
 	Gear               string `json:"gear"`
@@ -48,19 +50,21 @@ type AdditionalSpec struct {
 	MoistureProtection string `json:"moisture_protection"`
 }
 type PutProductBody struct {
-	CategoryId    string         `json:"category_id"`
-	Name          string         `json:"name"`
-	Short         string         `json:"short"`
-	Description   string         `json:"description"`
-	Price         int            `json:"price"`
-	Discount      int            `json:"discount"`
-	Tags          []string       `json:"tags"`
-	MainImage     string         `json:"main_image" example:"/images/example.png"`
-	XlsxName      string         `json:"xlsx_name"`
-	Specification AdditionalSpec `json:"specification"`
-	IsTrending    bool           `json:"is_trending"`
-	OnRequest     bool           `json:"on_request"`
-	OnStock       bool           `json:"on_stock"`
+	CategoryId     string         `json:"category_id"`
+	Name           string         `json:"name"`
+	Short          string         `json:"short"`
+	Description    string         `json:"description"`
+	Price          int            `json:"price"`
+	Discount       int            `json:"discount"`
+	Tags           []string       `json:"tags"`
+	MainImage      string         `json:"main_image" example:"/images/example.png"`
+	XlsxName       string         `json:"xlsx_name"`
+	Specification  AdditionalSpec `json:"specification"`
+	IsTrending     bool           `json:"is_trending"`
+	OnRequest      bool           `json:"on_request"`
+	OnStock        bool           `json:"on_stock"`
+	OnRequestPrice int            `json:"on_request_price"`
+	OnStockPrice   int            `json:"on_stock_price"`
 }
 type PutCategoryBody struct {
 	Id        string `json:"id"`

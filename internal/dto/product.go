@@ -27,6 +27,8 @@ type Product struct {
 	XlsxName          string    `json:"xlsx_name"`
 	OnRequest         bool      `json:"on_request"`
 	OnStock           bool      `json:"on_stock"`
+	OnRequestPrice    int       `json:"on_request_price"`
+	OnStockPrice      int       `json:"on_stock_price"`
 }
 
 type ProductDetail struct {
@@ -49,6 +51,8 @@ type ProductDetail struct {
 	Specification     Specification  `json:"specification"`
 	OnRequest         bool           `json:"on_request"`
 	OnStock           bool           `json:"on_stock"`
+	OnRequestPrice    int            `json:"on_request_price"`
+	OnStockPrice      int            `json:"on_stock_price"`
 	Images            []ProductImage `json:"images"`
 }
 
