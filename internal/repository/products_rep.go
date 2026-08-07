@@ -202,6 +202,8 @@ func AddProduct(c *gin.Context, body dto.AddProductBody) (schema.Products, error
 		XlsxName:    body.XlsxName,
 		MainImage:   body.MainImage,
 		IsTrending:  body.IsTrending,
+		OnStock:     body.OnStock,
+		OnRequest:   body.OnRequest,
 	}
 	ctx := c.Request.Context()
 
