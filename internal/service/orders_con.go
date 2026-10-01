@@ -85,6 +85,7 @@ func MailToAdmin(ord schema.Orders, prods []schema.OrderProducts) {
 	m := gomail.NewMessage()
 	m.SetHeader("From", mail)
 	m.SetHeader("To", mailto)
+	m.SetHeader("Reply-To", ord.Email)
 	m.SetHeader("Subject", "DellerEv - Новый заказ")
 
 	moscowZone := time.FixedZone("MSK", 3*60*60)
