@@ -25,6 +25,10 @@ func Contact(c *gin.Context) {
 		service.ErrorResponse(c, 400, "Плохой запрос")
 		return
 	}
+	if body.Email == "" || body.PhoneNumber == "" {
+		service.ErrorResponse(c, 400, "Плохой запрос")
+		return
+	}
 	ban := service.CheckForBanwords(body)
 	if ban {
 		c.JSON(200, map[string]string{"message": "Успешно! Ждите звонка, мы с вами свяжемся."})
