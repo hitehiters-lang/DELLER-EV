@@ -2463,6 +2463,9 @@ const docTemplate = `{
                 "comment": {
                     "type": "string"
                 },
+                "email": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },

@@ -46,6 +46,7 @@ func ContactToAdmin(b dto.ContactMail) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", mail)
 	m.SetHeader("To", mailto)
+	m.SetHeader("Reply-To", b.Email)
 	m.SetHeader("Subject", "DellerEv - Новое обращение")
 
 	moscowZone := time.FixedZone("MSK", 3*60*60)
@@ -57,8 +58,8 @@ func ContactToAdmin(b dto.ContactMail) error {
 		time.Now().In(moscowZone).Format("15:04:05"))
 	body.WriteString("Детали обращения:\n\n")
 
-	fmt.Fprintf(&body, "Имя: %v\nНомер телефона: %v\nСоздано: %v\nСообщение: \n\t%v\n",
-		b.Name, b.PhoneNumber, time.Now().In(moscowZone).Format("2006-01-02 15:04:05"), b.Comment)
+	fmt.Fprintf(&body, "Имя: %v\nНомер телефона: %v\nEmail отправителя:%v\nСоздано: %v\nСообщение: \n\t%v\n",
+		b.Name, b.PhoneNumber, b.Email, time.Now().In(moscowZone).Format("2006-01-02 15:04:05"), b.Comment)
 
 	m.SetBody("text/plain", body.String())
 
