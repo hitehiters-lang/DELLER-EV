@@ -1,10 +1,10 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Документация к API.\n\nv1.11 Изменения:\n\nРоуты создания/возвращения товаров (/api/v1/products... и /api/v1/admin/products...) теперь возвращают ещё два дополнительных поля:\n\n1. **on_stock_price** (int) - цена товара **В НАЛИЧИИ**. Если равна нулю (или on_stock == false), то на фронте на странице товара не должна отображаться.\n\n2. **on_request_price** (int) - цена товара **НА ЗАКАЗ**. Если равна нулю (или on_request == false), то на фронте на странице товара не должна отображаться.\n\nОба ценовых сегмента могут сосуществовать одновременно, либо отсутствовать. Если любая из новых цен != 0, тогда на странице товара не должна показываться обычная возвращаемая цена (price), а только те что указаны.\n\nОбязательно обновить админ панель на фронте! Нужно добавить в панели создания/изменения товара под переключателем В НАЛИЧИИ/ПОД ЗАКАЗ цены, как раз таки указанные сверху. Сам переключатель сделать необязательным, а вместо радиокнопки использовать флажок (чтобы можно было выбрать и то и то, а также указать и ту и ту цену)",
+        "description": "Документация к API.\n\n## Обновление API 1.2; Изменения:\n\n### 1. Роуты подкатегорий.\nПодкатегория - новая таблица в бд и поля в товарах.\nОна привязывается к Категории по FK, а товар привязывается и к категории и к подкатегории.\nКатегория у товара - обязательный параметр, а вот подкатегория необязательна и может быть равна ничему (\"\")\nПоиск по Категории всё ещё актуален и работает, но для поиска конкретно по подкатегориям нужно использовать новые роуты.\n\n### 2. Подкатегории в товарах.\nТеперь при возвращении товара возвращается и его подкатегория. Её не стоит отображать в карточке,\nтак как она может быть null, \"\" или вообще не возвращаться на роуте (тоже учитывать)\nВ админских роутах создания и изменения товара тоже было добавлено поле subcategory. Он не обязателен, если не выбран то должен отправляться на роут как \"\".\nПри изменении товара, и категория и подкатегория если не изменяются пользователем - должны отправляться на роут те же, что и пришли.\nТак же и с полем category_id у подкатегории.",
         "title": "Deller-Ev API",
         "contact": {},
-        "version": "1.11"
+        "version": "1.2"
     },
     "basePath": "/",
     "paths": {
@@ -142,8 +142,8 @@
                         "required": true
                     },
                     {
-                        "description": "Данные товара",
-                        "name": "login",
+                        "description": "Данные категории",
+                        "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -152,10 +152,10 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProductDetail"
+                            "$ref": "#/definitions/dto.Message"
                         }
                     },
                     "400": {
@@ -1027,7 +1027,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.AddProductBody"
+                            "$ref": "#/definitions/dto.PutProductBody"
                         }
                     }
                 ],
@@ -1155,6 +1155,198 @@
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Message"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/subcategories": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Подкатегории"
+                ],
+                "summary": "Создать новую категорию",
+                "operationId": "add_subcategory",
+                "parameters": [
+                    {
+                        "description": "Данные подкатегории",
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddSubcategoryBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Subcategory"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/subcategories/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Подкатегории"
+                ],
+                "summary": "Изменить подкатегорию",
+                "operationId": "put_subcategory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id подкатегории",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Данные подкатегории",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PutSubcategoryBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Message"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Подкатегории"
+                ],
+                "summary": "Удалить подкатегорию",
+                "operationId": "del_subcategory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id подкатегории",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.Message"
                         }
@@ -2229,6 +2421,119 @@
                     }
                 }
             }
+        },
+        "/subcategories/{id}/categories": {
+            "get": {
+                "description": "Возвращает id и имена подкатегорий",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Подкатегории"
+                ],
+                "summary": "Получить все подкатегории у категории",
+                "operationId": "get_subcategories",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id категории",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SubcategoriesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/subcategories/{id}/products": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Подкатегории"
+                ],
+                "summary": "Получить все товары определённой подкатегории",
+                "operationId": "get_products_sub",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Языковой код (ru, en, kk, zh)",
+                        "name": "l",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "id подкатегории",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProductsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -2312,6 +2617,9 @@
                 "specification": {
                     "$ref": "#/definitions/dto.AdditionalSpec"
                 },
+                "subcategory": {
+                    "type": "string"
+                },
                 "tags": {
                     "type": "array",
                     "items": {
@@ -2319,6 +2627,20 @@
                     }
                 },
                 "xlsx_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.AddSubcategoryBody": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -2784,6 +3106,9 @@
                 "spec": {
                     "type": "string"
                 },
+                "subcategory": {
+                    "type": "string"
+                },
                 "xlsx_name": {
                     "type": "string"
                 }
@@ -2852,6 +3177,9 @@
                 "specification": {
                     "$ref": "#/definitions/dto.Specification"
                 },
+                "subcategory": {
+                    "type": "string"
+                },
                 "tags": {
                     "type": "array",
                     "items": {
@@ -2918,6 +3246,77 @@
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.PutProductBody": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "discount": {
+                    "type": "integer"
+                },
+                "is_trending": {
+                    "type": "boolean"
+                },
+                "main_image": {
+                    "type": "string",
+                    "example": "/images/example.png"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "on_request": {
+                    "type": "boolean"
+                },
+                "on_request_price": {
+                    "type": "integer"
+                },
+                "on_stock": {
+                    "type": "boolean"
+                },
+                "on_stock_price": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "specification": {
+                    "$ref": "#/definitions/dto.AdditionalSpec"
+                },
+                "subcategory": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "xlsx_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.PutSubcategoryBody": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -3039,6 +3438,34 @@
                     "type": "string"
                 },
                 "weight": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SubcategoriesResponse": {
+            "type": "object",
+            "properties": {
+                "subcategories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.Subcategory"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.Subcategory": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }

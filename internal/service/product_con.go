@@ -35,6 +35,33 @@ func ConvertCategories(p []schema.Categories, code string) dto.CategoriesRespons
 	}
 }
 
+func ConvertSubcategories(p []schema.Subcategories, code string) dto.SubcategoriesResponse {
+	var subcate []dto.Subcategory
+	var total int
+	for _, e := range p {
+		gories := dto.Subcategory{
+			Id:         e.Id,
+			Name:       pkgtrans.TranslateText("subcategory_name_"+e.Id, e.Name, code),
+			CategoryId: e.CategoryId,
+		}
+		subcate = append(subcate, gories)
+		total++
+	}
+	return dto.SubcategoriesResponse{
+		Subcategories: subcate,
+		Total:         total,
+	}
+}
+
+func ConvertSubcategory(p schema.Subcategories) dto.Subcategory {
+	cat := dto.Subcategory{
+		Id:         p.Id,
+		Name:       p.Name,
+		CategoryId: p.CategoryId,
+	}
+	return cat
+}
+
 func ConvertCategory(p schema.Categories) dto.Category {
 	cat := dto.Category{
 		Id:              p.Id,
@@ -53,6 +80,7 @@ func ConvertProducts(p []schema.Products, code string) dto.ProductsResponse {
 		uct := dto.Product{
 			Id:                e.Id,
 			CategoryId:        e.CategoryId,
+			Subcategory:       e.Subcategory,
 			Spec:              e.Spec,
 			Name:              pkgtrans.TranslateText("product_name_"+e.Id, e.Name, code),
 			Short:             pkgtrans.TranslateText("product_short_"+e.Id, e.Short, code),
@@ -103,6 +131,7 @@ func ConvertProductDetail(p schema.Products, v []dto.ProductImage, code string) 
 	product := dto.ProductDetail{
 		Id:                p.Id,
 		CategoryId:        p.CategoryId,
+		Subcategory:       p.Subcategory,
 		Spec:              p.Spec,
 		Name:              pkgtrans.TranslateText("product_name_"+p.Id, p.Name, code),
 		Short:             pkgtrans.TranslateText("product_short_"+p.Id, p.Short, code),

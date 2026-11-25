@@ -23,20 +23,23 @@ import (
 // @description Введите JWT токен
 
 // @title Deller-Ev API
-// @version 1.11
+// @version 1.2
 // @description Документация к API.
 // @description
-// @description v1.11 Изменения:
+// @description ## Обновление API 1.2; Изменения:
 // @description
-// @description Роуты создания/возвращения товаров (/api/v1/products... и /api/v1/admin/products...) теперь возвращают ещё два дополнительных поля:
+// @description ### 1. Роуты подкатегорий.
+// @description Подкатегория - новая таблица в бд и поля в товарах.
+// @description Она привязывается к Категории по FK, а товар привязывается и к категории и к подкатегории.
+// @description Категория у товара - обязательный параметр, а вот подкатегория необязательна и может быть равна ничему ("")
+// @description Поиск по Категории всё ещё актуален и работает, но для поиска конкретно по подкатегориям нужно использовать новые роуты.
 // @description
-// @description 1. **on_stock_price** (int) - цена товара **В НАЛИЧИИ**. Если равна нулю (или on_stock == false), то на фронте на странице товара не должна отображаться.
-// @description
-// @description 2. **on_request_price** (int) - цена товара **НА ЗАКАЗ**. Если равна нулю (или on_request == false), то на фронте на странице товара не должна отображаться.
-// @description
-// @description Оба ценовых сегмента могут сосуществовать одновременно, либо отсутствовать. Если любая из новых цен != 0, тогда на странице товара не должна показываться обычная возвращаемая цена (price), а только те что указаны.
-// @description
-// @description Обязательно обновить админ панель на фронте! Нужно добавить в панели создания/изменения товара под переключателем В НАЛИЧИИ/ПОД ЗАКАЗ цены, как раз таки указанные сверху. Сам переключатель сделать необязательным, а вместо радиокнопки использовать флажок (чтобы можно было выбрать и то и то, а также указать и ту и ту цену)
+// @description ### 2. Подкатегории в товарах.
+// @description Теперь при возвращении товара возвращается и его подкатегория. Её не стоит отображать в карточке,
+// @description так как она может быть null, "" или вообще не возвращаться на роуте (тоже учитывать)
+// @description В админских роутах создания и изменения товара тоже было добавлено поле subcategory. Он не обязателен, если не выбран то должен отправляться на роут как "".
+// @description При изменении товара, и категория и подкатегория если не изменяются пользователем - должны отправляться на роут те же, что и пришли.
+// @description Так же и с полем category_id у подкатегории.
 // @BasePath /
 func main() {
 	config.LoadENV()
@@ -62,6 +65,9 @@ func main() {
 
 		api.GET("/categories", handlers.GetCategories)
 		api.GET("/categories/:id", handlers.GetProducts)
+
+		api.GET("/subcategories/:id/categories", handlers.GetSubcategories)
+		api.GET("/subcategories/:id/products", handlers.GetProductsSub)
 
 		api.GET("/products/:id", handlers.GetProductByID)
 		api.GET("/products/:id/relative", handlers.GetProductsByTag)
@@ -91,6 +97,10 @@ func main() {
 			auth.POST("/admin/images", handlers.AddPicture)
 			auth.POST("/admin/image-bind", handlers.BindPicture)
 			auth.DELETE("/admin/image-unbind", handlers.UnbindPicture)
+
+			auth.POST("/admin/subcategories", handlers.AddSubcategory)
+			auth.DELETE("/admin/subcategories/:id", handlers.DelSubcategory)
+			auth.PUT("/admin/subcategories/:id", handlers.PutSubcategory)
 
 			auth.POST("/admin/categories", handlers.AddCategory)
 			auth.DELETE("/admin/categories/:id", handlers.DelCategory)

@@ -14,9 +14,20 @@ type AddCategoryBody struct {
 	Name      string `json:"name"`
 	ImageName string `json:"image_name"`
 }
+type AddSubcategoryBody struct {
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	CategoryId string `json:"category_id"`
+}
+type PutSubcategoryBody struct {
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	CategoryId string `json:"category_id"`
+}
 type AddProductBody struct {
 	Id             string         `json:"id"`
 	CategoryId     string         `json:"category_id"`
+	Subcategory    string         `json:"subcategory,omitempty"`
 	Name           string         `json:"name"`
 	Short          string         `json:"short"`
 	Description    string         `json:"description"`
@@ -51,6 +62,7 @@ type AdditionalSpec struct {
 }
 type PutProductBody struct {
 	CategoryId     string         `json:"category_id"`
+	Subcategory    string         `json:"subcategory,omitempty"`
 	Name           string         `json:"name"`
 	Short          string         `json:"short"`
 	Description    string         `json:"description"`

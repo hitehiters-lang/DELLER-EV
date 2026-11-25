@@ -1,6 +1,7 @@
 package blog_gen
 
 import (
+	"deller/internal/config"
 	"fmt"
 	"time"
 )
@@ -8,7 +9,9 @@ import (
 func Start() {
 	fmt.Println("[BLOG_GEN] started background scheduler")
 
-	if !alreadyGeneratedToday() {
+	mk := config.GetMakePosts()
+
+	if !alreadyGeneratedToday() && mk == "1" {
 		fmt.Println("[BLOG_GEN] no post for today, generating on startup...")
 		go func() {
 			if err := generatePost(); err != nil {
@@ -19,7 +22,9 @@ func Start() {
 		}()
 	}
 
-	go run()
+	if mk == "1" {
+		go run()
+	}
 }
 
 func run() {

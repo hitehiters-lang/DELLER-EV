@@ -24,6 +24,7 @@ type Config struct {
 	GigaChatAPIURL string
 	GigaChatScope  string
 	AIAuthorID     string
+	MakePosts      string
 }
 
 var cfg Config
@@ -47,6 +48,7 @@ func LoadENV() {
 	cfg.GigaChatAPIURL = os.Getenv("GIGACHAT_API_URL")
 	cfg.GigaChatScope = os.Getenv("GIGACHAT_SCOPE")
 	cfg.AIAuthorID = os.Getenv("AI_AUTHOR_ID")
+	cfg.MakePosts = os.Getenv("MAKE_POSTS")
 
 	if cfg.DatabaseHost == "" {
 		cfg.DatabaseHost = "localhost"
@@ -74,6 +76,9 @@ func LoadENV() {
 	}
 	if cfg.GigaChatScope == "" {
 		cfg.GigaChatScope = "GIGACHAT_API_PERS"
+	}
+	if cfg.MakePosts == "" {
+		cfg.GigaChatScope = "0"
 	}
 }
 
@@ -118,4 +123,8 @@ func GetGigaChatScope() string {
 func GetAIAuthorID() uuid.UUID {
 	id, _ := uuid.Parse(cfg.AIAuthorID)
 	return id
+}
+
+func GetMakePosts() string {
+	return cfg.MakePosts
 }

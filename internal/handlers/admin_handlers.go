@@ -236,6 +236,60 @@ func UnbindPicture(c *gin.Context) {
 	c.JSON(201, res)
 }
 
+// @Tags Подкатегории
+// @Summary Создать новую категорию
+// @ID add_subcategory
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param login body dto.AddSubcategoryBody true "Данные подкатегории"
+// @Success 201 {object} dto.Subcategory
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 409 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/subcategories [post]
+func AddSubcategory(c *gin.Context) {
+
+	r, err := pkgauth.GetCurrentRights(c)
+	if r != "a" && r != "r" {
+		service.ErrorResponse(c, 403, "Недостаточно прав")
+		return
+	}
+
+	var body dto.AddSubcategoryBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		service.ErrorResponse(c, 400, "Плохой запрос")
+		return
+	}
+
+	err = repository.CheckSubcategory(c, body.Id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			err = repository.CheckCategory(c, body.CategoryId)
+			if err == sql.ErrNoRows {
+				service.ErrorResponse(c, 400, "Заданной родительской категории не существует")
+				return
+			} else if err != nil {
+				service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+				return
+			}
+			new_subcategory, err := repository.AddSubcategory(c, body)
+			if err != nil {
+				service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+				return
+			}
+			res := service.ConvertSubcategory(new_subcategory)
+			c.JSON(201, res)
+			go service.CacheSubcategory(new_subcategory)
+			return
+		}
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
+	service.ErrorResponse(c, 409, "Подкатегория уже существует")
+}
+
 // @Tags Админ
 // @Summary Создать новую категорию
 // @ID add_category
@@ -280,6 +334,110 @@ func AddCategory(c *gin.Context) {
 		return
 	}
 	service.ErrorResponse(c, 409, "Категория уже существует")
+}
+
+// @Tags Подкатегории
+// @Summary Удалить подкатегорию
+// @ID del_subcategory
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "id подкатегории"
+// @Success 200 {object} dto.Message
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/subcategories/{id} [delete]
+func DelSubcategory(c *gin.Context) {
+
+	r, err := pkgauth.GetCurrentRights(c)
+	if r != "a" && r != "r" {
+		service.ErrorResponse(c, 403, "Недостаточно прав")
+		return
+	}
+
+	subcategory := c.Param("id")
+	if subcategory == "" {
+		service.ErrorResponse(c, 400, "Подкатегория не указана")
+		return
+	}
+
+	err = repository.CheckSubcategory(c, subcategory)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			service.ErrorResponse(c, 404, "Подкатегория не существует")
+			return
+		}
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
+
+	err = repository.DeleteSubcategory(c, subcategory)
+	if err != nil {
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
+	c.JSON(200, dto.Message{
+		Code:    200,
+		Message: "Подкатегория " + subcategory + " успешно удалена",
+	})
+}
+
+// @Tags Подкатегории
+// @Summary Изменить подкатегорию
+// @ID put_subcategory
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "id подкатегории"
+// @Param data body dto.PutSubcategoryBody true "Данные подкатегории"
+// @Success 200 {object} dto.Message
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 403 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /admin/subcategories/{id} [put]
+func PutSubcategory(c *gin.Context) {
+
+	r, err := pkgauth.GetCurrentRights(c)
+	if r != "a" && r != "r" {
+		service.ErrorResponse(c, 403, "Недостаточно прав")
+		return
+	}
+
+	var body dto.PutSubcategoryBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		service.ErrorResponse(c, 400, "Плохой запрос")
+		return
+	}
+
+	subcategory := c.Param("id")
+	if subcategory == "" {
+		service.ErrorResponse(c, 400, "Подкатегория не указана")
+		return
+	}
+
+	err = repository.CheckSubcategory(c, subcategory)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			service.ErrorResponse(c, 404, "Подкатегория не существует")
+			return
+		}
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	}
+
+	subs, err := repository.PutSubcategory(c, body, subcategory)
+	if err != nil {
+		service.ErrorResponse(c, 400, "Ошибка: "+err.Error())
+		return
+	}
+	go service.CacheSubcategory(subs)
+	c.JSON(200, dto.Message{
+		Code:    200,
+		Message: "Подкатегория " + subcategory + " успешно изменена",
+	})
 }
 
 // @Tags Админ
@@ -435,7 +593,7 @@ func DelProduct(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "id товара"
-// @Param login body dto.AddProductBody true "Данные товара"
+// @Param login body dto.PutProductBody true "Данные товара"
 // @Success 201 {object} dto.ProductDetail
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 403 {object} dto.ErrorMessage
@@ -491,8 +649,8 @@ func PutProduct(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "id категории"
-// @Param login body dto.PutCategoryBody true "Данные товара"
-// @Success 201 {object} dto.ProductDetail
+// @Param data body dto.PutCategoryBody true "Данные категории"
+// @Success 200 {object} dto.Message
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 403 {object} dto.ErrorMessage
 // @Failure 404 {object} dto.ErrorMessage

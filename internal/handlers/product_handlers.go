@@ -41,6 +41,84 @@ func GetCategories(c *gin.Context) {
 	c.JSON(200, res)
 }
 
+// @Tags Подкатегории
+// @Summary Получить все подкатегории у категории
+// @Description Возвращает id и имена подкатегорий
+// @ID get_subcategories
+// @Accept json
+// @Produce json
+// @Param id path string true "id категории"
+// @Param l query string false "Языковой код (ru, en, kk, zh)"
+// @Success 200 {object} dto.SubcategoriesResponse
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /subcategories/{id}/categories [get]
+func GetSubcategories(c *gin.Context) {
+
+	l := service.LoadLocalisation(c)
+	if l == "" {
+		l = "ru"
+	}
+
+	category := c.Param("id")
+	if category == "" {
+		service.ErrorResponse(c, 400, "Категория не указана")
+		return
+	}
+
+	err, count, subs := repository.GetSubcategories(c, category)
+	if err != nil && err != sql.ErrNoRows {
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	} else if count == 0 {
+		service.ErrorResponse(c, 404, "Ни одной подкатегории не найдено")
+		return
+	}
+
+	res := service.ConvertSubcategories(subs, l)
+
+	c.JSON(200, res)
+}
+
+// @Tags Подкатегории
+// @Summary Получить все товары определённой подкатегории
+// @ID get_products_sub
+// @Accept json
+// @Produce json
+// @Param l query string false "Языковой код (ru, en, kk, zh)"
+// @Param id path string true "id подкатегории"
+// @Success 200 {object} dto.ProductsResponse
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 500 {object} dto.ErrorMessage
+// @Router /subcategories/{id}/products [get]
+func GetProductsSub(c *gin.Context) {
+
+	l := service.LoadLocalisation(c)
+	if l == "" {
+		l = "ru"
+	}
+
+	subcategory := c.Param("id")
+	if subcategory == "" {
+		service.ErrorResponse(c, 400, "Подкатегория не указана")
+		return
+	}
+
+	err, count, sch := repository.SelectProductsBySubcategory(c, subcategory)
+	if err != nil && err != sql.ErrNoRows {
+		service.ErrorResponse(c, 500, "Ошибка сервера: "+err.Error())
+		return
+	} else if count == 0 {
+		service.ErrorResponse(c, 404, "Ни одного продукта по заданной подкатегории не найдено")
+		return
+	}
+	res := service.ConvertProducts(sch, l)
+
+	c.JSON(200, res)
+}
+
 // @Tags Товары
 // @Summary Получить все товары определённой категории
 // @ID get_products

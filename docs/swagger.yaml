@@ -53,11 +53,22 @@ definitions:
         type: string
       specification:
         $ref: '#/definitions/dto.AdditionalSpec'
+      subcategory:
+        type: string
       tags:
         items:
           type: string
         type: array
       xlsx_name:
+        type: string
+    type: object
+  dto.AddSubcategoryBody:
+    properties:
+      category_id:
+        type: string
+      id:
+        type: string
+      name:
         type: string
     type: object
   dto.AdditionalSpec:
@@ -360,6 +371,8 @@ definitions:
         type: string
       spec:
         type: string
+      subcategory:
+        type: string
       xlsx_name:
         type: string
     type: object
@@ -405,6 +418,8 @@ definitions:
         type: string
       specification:
         $ref: '#/definitions/dto.Specification'
+      subcategory:
+        type: string
       tags:
         items:
           type: string
@@ -448,6 +463,53 @@ definitions:
       image_name:
         type: string
       title:
+        type: string
+    type: object
+  dto.PutProductBody:
+    properties:
+      category_id:
+        type: string
+      description:
+        type: string
+      discount:
+        type: integer
+      is_trending:
+        type: boolean
+      main_image:
+        example: /images/example.png
+        type: string
+      name:
+        type: string
+      on_request:
+        type: boolean
+      on_request_price:
+        type: integer
+      on_stock:
+        type: boolean
+      on_stock_price:
+        type: integer
+      price:
+        type: integer
+      short:
+        type: string
+      specification:
+        $ref: '#/definitions/dto.AdditionalSpec'
+      subcategory:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      xlsx_name:
+        type: string
+    type: object
+  dto.PutSubcategoryBody:
+    properties:
+      category_id:
+        type: string
+      id:
+        type: string
+      name:
         type: string
     type: object
   dto.RegisterBody:
@@ -529,6 +591,24 @@ definitions:
       weight:
         type: string
     type: object
+  dto.SubcategoriesResponse:
+    properties:
+      subcategories:
+        items:
+          $ref: '#/definitions/dto.Subcategory'
+        type: array
+      total:
+        type: integer
+    type: object
+  dto.Subcategory:
+    properties:
+      category_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
   dto.UploadMessage:
     properties:
       code:
@@ -588,19 +668,22 @@ info:
   description: |-
     Документация к API.
 
-    v1.11 Изменения:
+    ## Обновление API 1.2; Изменения:
 
-    Роуты создания/возвращения товаров (/api/v1/products... и /api/v1/admin/products...) теперь возвращают ещё два дополнительных поля:
+    ### 1. Роуты подкатегорий.
+    Подкатегория - новая таблица в бд и поля в товарах.
+    Она привязывается к Категории по FK, а товар привязывается и к категории и к подкатегории.
+    Категория у товара - обязательный параметр, а вот подкатегория необязательна и может быть равна ничему ("")
+    Поиск по Категории всё ещё актуален и работает, но для поиска конкретно по подкатегориям нужно использовать новые роуты.
 
-    1. **on_stock_price** (int) - цена товара **В НАЛИЧИИ**. Если равна нулю (или on_stock == false), то на фронте на странице товара не должна отображаться.
-
-    2. **on_request_price** (int) - цена товара **НА ЗАКАЗ**. Если равна нулю (или on_request == false), то на фронте на странице товара не должна отображаться.
-
-    Оба ценовых сегмента могут сосуществовать одновременно, либо отсутствовать. Если любая из новых цен != 0, тогда на странице товара не должна показываться обычная возвращаемая цена (price), а только те что указаны.
-
-    Обязательно обновить админ панель на фронте! Нужно добавить в панели создания/изменения товара под переключателем В НАЛИЧИИ/ПОД ЗАКАЗ цены, как раз таки указанные сверху. Сам переключатель сделать необязательным, а вместо радиокнопки использовать флажок (чтобы можно было выбрать и то и то, а также указать и ту и ту цену)
+    ### 2. Подкатегории в товарах.
+    Теперь при возвращении товара возвращается и его подкатегория. Её не стоит отображать в карточке,
+    так как она может быть null, "" или вообще не возвращаться на роуте (тоже учитывать)
+    В админских роутах создания и изменения товара тоже было добавлено поле subcategory. Он не обязателен, если не выбран то должен отправляться на роут как "".
+    При изменении товара, и категория и подкатегория если не изменяются пользователем - должны отправляться на роут те же, что и пришли.
+    Так же и с полем category_id у подкатегории.
   title: Deller-Ev API
-  version: "1.11"
+  version: "1.2"
 paths:
   /admin/cache:
     post:
@@ -720,19 +803,19 @@ paths:
         name: id
         required: true
         type: string
-      - description: Данные товара
+      - description: Данные категории
         in: body
-        name: login
+        name: data
         required: true
         schema:
           $ref: '#/definitions/dto.PutCategoryBody'
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
-            $ref: '#/definitions/dto.ProductDetail'
+            $ref: '#/definitions/dto.Message'
         "400":
           description: Bad Request
           schema:
@@ -1303,7 +1386,7 @@ paths:
         name: login
         required: true
         schema:
-          $ref: '#/definitions/dto.AddProductBody'
+          $ref: '#/definitions/dto.PutProductBody'
       produces:
       - application/json
       responses:
@@ -1372,6 +1455,129 @@ paths:
       summary: Удалить отзыв
       tags:
       - Отзывы
+  /admin/subcategories:
+    post:
+      consumes:
+      - application/json
+      operationId: add_subcategory
+      parameters:
+      - description: Данные подкатегории
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddSubcategoryBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.Subcategory'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Создать новую категорию
+      tags:
+      - Подкатегории
+  /admin/subcategories/{id}:
+    delete:
+      consumes:
+      - application/json
+      operationId: del_subcategory
+      parameters:
+      - description: id подкатегории
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Удалить подкатегорию
+      tags:
+      - Подкатегории
+    put:
+      consumes:
+      - application/json
+      operationId: put_subcategory
+      parameters:
+      - description: id подкатегории
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Данные подкатегории
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PutSubcategoryBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Изменить подкатегорию
+      tags:
+      - Подкатегории
   /admin/xlsx-export:
     get:
       consumes:
@@ -2136,6 +2342,81 @@ paths:
       summary: Написать отзыв к товару
       tags:
       - Отзывы
+  /subcategories/{id}/categories:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает id и имена подкатегорий
+      operationId: get_subcategories
+      parameters:
+      - description: id категории
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Языковой код (ru, en, kk, zh)
+        in: query
+        name: l
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SubcategoriesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Получить все подкатегории у категории
+      tags:
+      - Подкатегории
+  /subcategories/{id}/products:
+    get:
+      consumes:
+      - application/json
+      operationId: get_products_sub
+      parameters:
+      - description: Языковой код (ru, en, kk, zh)
+        in: query
+        name: l
+        type: string
+      - description: id подкатегории
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProductsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      summary: Получить все товары определённой подкатегории
+      tags:
+      - Подкатегории
 securityDefinitions:
   BearerAuth:
     description: Введите JWT токен

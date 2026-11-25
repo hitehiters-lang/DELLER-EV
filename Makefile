@@ -25,4 +25,4 @@ run:
 	go run cmd/server/main.go
 
 runt:
-	cd build/libretranslate && activate
+	build\libretranslate\venv\Scripts\python.exe -c "from libretranslate.main import main; main()" --port 5000 --host 127.0.0.1 --load-only en,ru,zh --api-keys --req-limit 0

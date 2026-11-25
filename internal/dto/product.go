@@ -13,9 +13,21 @@ type Category struct {
 	TotalInCategory int    `json:"total_in_category"`
 }
 
+type Subcategory struct {
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	CategoryId string `json:"category_id"`
+}
+
+type SubcategoriesResponse struct {
+	Subcategories []Subcategory `json:"subcategories"`
+	Total         int           `json:"total"`
+}
+
 type Product struct {
 	Id                string    `json:"id"`
 	CategoryId        string    `json:"category_id"`
+	Subcategory       string    `json:"subcategory,omitempty"`
 	Spec              uuid.UUID `json:"spec"`
 	Name              string    `json:"name"`
 	Short             string    `json:"short"`
@@ -34,6 +46,7 @@ type Product struct {
 type ProductDetail struct {
 	Id                string         `json:"id"`
 	CategoryId        string         `json:"category_id"`
+	Subcategory       string         `json:"subcategory,omitempty"`
 	Spec              uuid.UUID      `json:"spec"`
 	Name              string         `json:"name"`
 	Short             string         `json:"short"`

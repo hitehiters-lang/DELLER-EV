@@ -14,9 +14,16 @@ type Categories struct {
 	ProductsCount int `bun:",scanonly"`
 }
 
+type Subcategories struct {
+	Id         string `bun:"id"`
+	Name       string `bun:"name"`
+	CategoryId string `bun:"category_id"`
+}
+
 type Products struct {
 	Id             string    `bun:"id,pk"`
 	CategoryId     string    `bun:"category_id"`
+	Subcategory    string    `bun:"subcategory"`
 	Spec           uuid.UUID `bun:"spec"`
 	Name           string    `bun:"name"`
 	Short          string    `bun:"short"`

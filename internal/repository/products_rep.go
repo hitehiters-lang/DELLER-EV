@@ -15,6 +15,76 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 )
 
+func GetSubcategories(c *gin.Context, cat_id string) (error, int, []schema.Subcategories) {
+	var subcategories []schema.Subcategories
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	count, err := db.NewSelect().Model(&subcategories).Where("category_id = ?", cat_id).ScanAndCount(ctx)
+	return err, count, subcategories
+}
+
+func SelectProductsBySubcategory(c *gin.Context, sub_id string) (error, int, []schema.Products) {
+	var products []schema.Products
+	ctx := c.Request.Context()
+	db := database.GetDatabase()
+
+	count, err := db.NewSelect().
+		Model(&products).
+		Where("subcategory = ?", sub_id).
+		Where("deleted_at IS NULL").
+		OrderBy("is_trending", bun.OrderDesc).
+		ScanAndCount(ctx)
+	return err, count, products
+}
+
+func CheckSubcategory(c *gin.Context, sub_id string) error {
+	var subcategories schema.Subcategories
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	err := db.NewSelect().Model(&subcategories).Where("id = ?", sub_id).Scan(ctx)
+	return err
+}
+
+func AddSubcategory(c *gin.Context, body dto.AddSubcategoryBody) (schema.Subcategories, error) {
+	new_subcategory := schema.Subcategories{
+		Id:         body.Id,
+		Name:       body.Name,
+		CategoryId: body.CategoryId,
+	}
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	err := db.NewInsert().Model(&new_subcategory).Returning("*").Scan(ctx)
+	return new_subcategory, err
+}
+
+func DeleteSubcategory(c *gin.Context, sub string) error {
+	var del_subcategory schema.Subcategories
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	_, err := db.NewDelete().Model(&del_subcategory).Where("id = ?", sub).Exec(ctx)
+	return err
+}
+
+func PutSubcategory(c *gin.Context, body dto.PutSubcategoryBody, id string) (schema.Subcategories, error) {
+	ctx := c.Request.Context()
+
+	db := database.GetDatabase()
+	upd_sub := schema.Subcategories{
+		Id:         body.Id,
+		Name:       body.Name,
+		CategoryId: body.CategoryId,
+	}
+	err := db.NewUpdate().Model(&upd_sub).Where("id = ?", id).Returning("*").Scan(ctx)
+	if err != nil {
+		return schema.Subcategories{}, err
+	}
+	return upd_sub, nil
+}
+
 func GetCategories(c *gin.Context) (error, int, []schema.Categories) {
 	var categories []schema.Categories
 	ctx := c.Request.Context()
@@ -191,6 +261,7 @@ func AddProduct(c *gin.Context, body dto.AddProductBody) (schema.Products, error
 	new_product := schema.Products{
 		Id:             body.Id,
 		CategoryId:     body.CategoryId,
+		Subcategory:    body.Subcategory,
 		Spec:           spec_uuid,
 		Name:           body.Name,
 		Short:          body.Short,
@@ -282,6 +353,7 @@ func PutProduct(c *gin.Context, body dto.PutProductBody, id string) (schema.Prod
 	new_product := schema.Products{
 		Id:             prod.Id,
 		CategoryId:     body.CategoryId,
+		Subcategory:    body.Subcategory,
 		Spec:           prod.Spec,
 		Name:           body.Name,
 		Short:          body.Short,

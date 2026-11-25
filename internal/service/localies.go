@@ -28,6 +28,12 @@ func CacheCategory(cat schema.Categories) {
 	fmt.Println("[SERVER] - category \"" + cat.Id + "\" cached by creation")
 }
 
+func CacheSubcategory(cat schema.Subcategories) {
+	pkgtrans.TranslateText("subcategory_name_"+cat.Id, cat.Name, "zh")
+
+	fmt.Println("[SERVER] - subcategory \"" + cat.Id + "\" cached by creation")
+}
+
 func CacheManual(m schema.Manuals) {
 	pkgtrans.TranslateText("manual_name_"+m.Slug, m.Name, "zh")
 
