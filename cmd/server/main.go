@@ -28,7 +28,7 @@ import (
 // @description
 // @description ## Обновление API 1.3; Изменения:
 // @description
-// @description
+// @description ### Добавлен роут получения писем обращений из бд.
 // @description
 // @description ## Обновление API 1.2; Изменения:
 // @description
