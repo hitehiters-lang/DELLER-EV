@@ -158,12 +158,27 @@ definitions:
     properties:
       comment:
         type: string
+      created_at:
+        type: string
       email:
         type: string
+      id:
+        type: integer
+      is_banned:
+        type: boolean
       name:
         type: string
       phone_number:
         type: string
+    type: object
+  dto.ContactsResponse:
+    properties:
+      mails:
+        items:
+          $ref: '#/definitions/dto.ContactMail'
+        type: array
+      total:
+        type: integer
     type: object
   dto.CreateOrder:
     properties:
@@ -551,6 +566,17 @@ definitions:
       total:
         type: integer
     type: object
+  dto.SendContactMail:
+    properties:
+      comment:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+    type: object
   dto.SlugReturn:
     properties:
       slug:
@@ -668,6 +694,10 @@ info:
   description: |-
     Документация к API.
 
+    ## Обновление API 1.3; Изменения:
+
+
+
     ## Обновление API 1.2; Изменения:
 
     ### 1. Роуты подкатегорий.
@@ -683,7 +713,7 @@ info:
     При изменении товара, и категория и подкатегория если не изменяются пользователем - должны отправляться на роут те же, что и пришли.
     Так же и с полем category_id у подкатегории.
   title: Deller-Ev API
-  version: "1.2"
+  version: "1.3"
 paths:
   /admin/cache:
     post:
@@ -877,6 +907,42 @@ paths:
       summary: Удалить комментарий
       tags:
       - Комментарии
+  /admin/contact:
+    get:
+      consumes:
+      - application/json
+      description: Получить все письма из бд. Доступно только админам.
+      operationId: get_mails
+      parameters:
+      - description: Фильтр забаненных. n - письма прошедшие проверку (default), b
+          - только забаненные письма, a - все
+        in: query
+        name: filter
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ContactsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Получить все письма.
+      tags:
+      - Связь
   /admin/files:
     post:
       consumes:
@@ -1492,7 +1558,7 @@ paths:
             $ref: '#/definitions/dto.ErrorMessage'
       security:
       - BearerAuth: []
-      summary: Создать новую категорию
+      summary: Создать новую подкатегорию
       tags:
       - Подкатегории
   /admin/subcategories/{id}:
@@ -2091,7 +2157,7 @@ paths:
         name: contacter
         required: true
         schema:
-          $ref: '#/definitions/dto.ContactMail'
+          $ref: '#/definitions/dto.SendContactMail'
       produces:
       - application/json
       responses:

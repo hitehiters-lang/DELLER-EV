@@ -313,6 +313,61 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/contact": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Получить все письма из бд. Доступно только админам.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Связь"
+                ],
+                "summary": "Получить все письма.",
+                "operationId": "get_mails",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Фильтр забаненных. n - письма прошедшие проверку (default), b - только забаненные письма, a - все",
+                        "name": "filter",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ContactsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/files": {
             "post": {
                 "security": [
@@ -1209,7 +1264,7 @@ const docTemplate = `{
                 "tags": [
                     "Подкатегории"
                 ],
-                "summary": "Создать новую категорию",
+                "summary": "Создать новую подкатегорию",
                 "operationId": "add_subcategory",
                 "parameters": [
                     {
@@ -2066,7 +2121,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.ContactMail"
+                            "$ref": "#/definitions/dto.SendContactMail"
                         }
                     }
                 ],
@@ -2785,14 +2840,37 @@ const docTemplate = `{
                 "comment": {
                     "type": "string"
                 },
+                "created_at": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_banned": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
                 },
                 "phone_number": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.ContactsResponse": {
+            "type": "object",
+            "properties": {
+                "mails": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ContactMail"
+                    }
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },
@@ -3388,6 +3466,23 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SendContactMail": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.SlugReturn": {
             "type": "object",
             "properties": {
@@ -3573,12 +3668,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.2",
+	Version:          "1.3",
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Deller-Ev API",
-	Description:      "Документация к API.\n\n## Обновление API 1.2; Изменения:\n\n### 1. Роуты подкатегорий.\nПодкатегория - новая таблица в бд и поля в товарах.\nОна привязывается к Категории по FK, а товар привязывается и к категории и к подкатегории.\nКатегория у товара - обязательный параметр, а вот подкатегория необязательна и может быть равна ничему (\"\")\nПоиск по Категории всё ещё актуален и работает, но для поиска конкретно по подкатегориям нужно использовать новые роуты.\n\n### 2. Подкатегории в товарах.\nТеперь при возвращении товара возвращается и его подкатегория. Её не стоит отображать в карточке,\nтак как она может быть null, \"\" или вообще не возвращаться на роуте (тоже учитывать)\nВ админских роутах создания и изменения товара тоже было добавлено поле subcategory. Он не обязателен, если не выбран то должен отправляться на роут как \"\".\nПри изменении товара, и категория и подкатегория если не изменяются пользователем - должны отправляться на роут те же, что и пришли.\nТак же и с полем category_id у подкатегории.",
+	Description:      "Документация к API.\n\n## Обновление API 1.3; Изменения:\n\n\n\n## Обновление API 1.2; Изменения:\n\n### 1. Роуты подкатегорий.\nПодкатегория - новая таблица в бд и поля в товарах.\nОна привязывается к Категории по FK, а товар привязывается и к категории и к подкатегории.\nКатегория у товара - обязательный параметр, а вот подкатегория необязательна и может быть равна ничему (\"\")\nПоиск по Категории всё ещё актуален и работает, но для поиска конкретно по подкатегориям нужно использовать новые роуты.\n\n### 2. Подкатегории в товарах.\nТеперь при возвращении товара возвращается и его подкатегория. Её не стоит отображать в карточке,\nтак как она может быть null, \"\" или вообще не возвращаться на роуте (тоже учитывать)\nВ админских роутах создания и изменения товара тоже было добавлено поле subcategory. Он не обязателен, если не выбран то должен отправляться на роут как \"\".\nПри изменении товара, и категория и подкатегория если не изменяются пользователем - должны отправляться на роут те же, что и пришли.\nТак же и с полем category_id у подкатегории.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

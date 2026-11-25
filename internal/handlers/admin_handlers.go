@@ -237,7 +237,7 @@ func UnbindPicture(c *gin.Context) {
 }
 
 // @Tags Подкатегории
-// @Summary Создать новую категорию
+// @Summary Создать новую подкатегорию
 // @ID add_subcategory
 // @Security BearerAuth
 // @Accept json

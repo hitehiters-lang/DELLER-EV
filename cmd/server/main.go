@@ -23,8 +23,12 @@ import (
 // @description Введите JWT токен
 
 // @title Deller-Ev API
-// @version 1.2
+// @version 1.3
 // @description Документация к API.
+// @description
+// @description ## Обновление API 1.3; Изменения:
+// @description
+// @description
 // @description
 // @description ## Обновление API 1.2; Изменения:
 // @description
@@ -127,6 +131,8 @@ func main() {
 			auth.GET("/admin/xlsx-export", handlers.ExportPricesToXlsx)
 
 			auth.POST("/admin/cache", handlers.CacheAll)
+
+			auth.GET("/admin/contact", handlers.GetMails)
 		}
 	}
 

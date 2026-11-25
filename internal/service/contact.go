@@ -12,7 +12,7 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-func CheckForBanwords(b dto.ContactMail) bool {
+func CheckForBanwords(b dto.SendContactMail) bool {
 	data, err := os.ReadFile("shared/banwords_list.txt")
 	if err != nil {
 		fmt.Println("[SERVER] - can't read banwords_list.txt:", err)
@@ -39,7 +39,7 @@ func CheckForBanwords(b dto.ContactMail) bool {
 	return false
 }
 
-func ContactToAdmin(b dto.ContactMail) error {
+func ContactToAdmin(b dto.SendContactMail) error {
 
 	mail, pass, mailto := config.GetMail()
 
